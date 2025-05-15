@@ -1,5 +1,5 @@
 "use server";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
 import {
   ApiResponseType,
@@ -38,11 +38,11 @@ export const sendOTP = async (Phone: string) => {
       },
     });
     const data = await res.data;
-    toast.success(data?.message);
+    // toast.success(data?.message);
     return data;
   } catch (error: any) {
     console.log(error);
-    toast.error(error?.message);
+    // toast.error(error?.message);
     return error;
   }
 };
@@ -67,7 +67,7 @@ export const register = async (
     const data = await res.data;
     return data;
   } catch (error: any) {
-    toast.error(error?.message);
+    // toast.error(error?.message);
     return error;
   }
 };
@@ -75,20 +75,26 @@ export const register = async (
 export const verifyOTP = async (
   payload: OTPValidationType
 ): Promise<ApiResponseType> => {
-  console.log(0 + payload.Phone);
+
+  await createSession()
   try {
-    const res = await sendRequest().post("/Login/LoginPhoneAcept", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`, {
+      method: "POST",
       headers: {
         Phone: payload.Phone,
         Code: payload.Code,
       },
     });
 
-    const data = await res.data;
+    console.log(res)
 
+    const data = await res.json();
+
+    console.log(data)
+    
     return data;
   } catch (error: any) {
-    toast.error(error?.message);
+    // toast.error(error?.message);
     return error;
   }
 };
@@ -97,20 +103,17 @@ export const getDailyData = async () => {
   // const generateUniqueID = await fetch("/api/set-device-id", { method: "GET" });
   // console.log(generateUniqueID);
   const deviceId = (await cookies()).get("deviceId")?.value;
-  
-  // if (!deviceId) {
-  //   await fetch("/api/set-device-id/hello.ts")
-  // }
-  
+
+  if (!deviceId) {
+    await fetch("/api/set-device-id/hello.ts");
+  }
+
   // await createSession();
   try {
     const res = await sendRequest("USER").get(
-      `/CallOfTheDay/GetDaily?UserID=638829301705529205`
-    , {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+      `/CallOfTheDay/GetDaily?UserID=638829301705529205`,
+      {}
+    );
     const data = await res.data;
     return data;
   } catch (error: any) {

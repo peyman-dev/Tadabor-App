@@ -23,21 +23,21 @@ interface AuthValuesType {
 type LoginMethodType = "PASSWORD" | "OTP"
 
 const LoginPage = () => {
+    const [loginMethod, setLoginMethod] = useState<LoginMethodType>("PASSWORD")
     const { setValue, formState: { errors }, watch, handleSubmit, register } = useForm({
         defaultValues: {
             phoneNumber: "",
             password: ""
         },
-        resolver: zodResolver(loginValidation)
+        resolver: zodResolver(loginValidation(loginMethod))
     })
 
-    const [loginMethod, setLoginMethod] = useState<LoginMethodType>("PASSWORD")
 
     const [isLoading, setIsLoading] = useState(false)
 
     const { openUI, closeUI } = useModal()
 
-    const submitted = async (values: AuthValuesType) => {
+    const submitted = async (values: any) => {
         if (loginMethod === "PASSWORD") {
             try {
                 setIsLoading(true)
@@ -56,15 +56,15 @@ const LoginPage = () => {
         } else {
             try {
                 setIsLoading(true)
-
+                console.log(values.phoneNumber)
                 const res = await sendOTP(String("0" + values.phoneNumber))
                 
                 if (res.erroCode == 200) {
                     openUI(<OTPModal phone={String("0" + values.phoneNumber)}/>)
                 }
 
-            } catch (error) {
-                console.log(error)
+            } catch (error: any) {
+                toast.error(error?.message)
             } finally {
                 setIsLoading(false)
             }
@@ -85,11 +85,11 @@ const LoginPage = () => {
             </header>
             <main className='space-y-[35.5px]'>
 
-                <AuthInput error={errors.phoneNumber?.message} icon={<PhoneIcon />} type='number' onChange={(value: any) => {
+                <AuthInput error={errors.phoneNumber?.message} icon={<PhoneIcon />} type='number' onChange={(value: never) => {
                     setValue("phoneNumber", value)
                 }} isRequired label="شماره همراه" />
                 {loginMethod == "PASSWORD" ?
-                    <AuthInput error={errors.password?.message} icon={<PasswordIcon />} type='password' onChange={(value: any) => {
+                    <AuthInput error={errors.password?.message} icon={<PasswordIcon />} type='password' onChange={(value: never) => {
                         setValue("password", value)
                     }} isRequired label="گذرواژه" />
                     : null

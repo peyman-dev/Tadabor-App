@@ -18,7 +18,6 @@ export default async function RootLayout({
 }>) {
 
   const initSession = await createSession();
-  console.log(initSession)
 
   return (
     <html lang="fa-IR" dir="rtl">

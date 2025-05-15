@@ -29,3 +29,5 @@ export type OTPValidationType = {
   Phone: RegisterType["phone"],
   Code: string
 }
+
+export type LoginMethodType = "OTP" | "PASSWORD"
