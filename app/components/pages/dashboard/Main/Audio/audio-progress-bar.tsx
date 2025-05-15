@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { Play, Pause, PauseIcon, PlayIcon, Forward } from 'lucide-react';
+import { Play, Pause, PauseIcon, PlayIcon, Forward, FastForward } from 'lucide-react';
 
 interface AudioProgressBarProps {
     audioSrc: string;
@@ -88,7 +88,7 @@ const AudioProgressBar: React.FC<AudioProgressBarProps> = ({
     };
 
     return (
-        <div className="flex items-center justify-center gap-8 flex-col">
+        <div className="flex items-center justify-center gap-8 flex-col w-full">
             <div className="flex flex-col gap-2 w-full max-w-md" dir='ltr'>
                 <audio ref={audioRef} src={audioSrc} />
                 <div className="flex items-center gap-3">
@@ -122,19 +122,18 @@ const AudioProgressBar: React.FC<AudioProgressBarProps> = ({
                     <span>{formatTime(duration)}</span>
                 </div>
             </div>
-            <div className='flex items-center **:bg-[#E6C472] text-white gap-[25px] **:cursor-pointer **:rounded-full **:flex **:items-center **:justify-center **:size-[57px]'>
-                <button>
-
+            <div className='flex items-center  *:size-[45px] *:bg-gradient-to-t *:from-[#CDA84D] *:to-[#E6C472] text-white gap-5 md:gap-[25px] *:cursor-pointer *:rounded-full *:flex *:items-center *:justify-center *:md:size-[57px]'>
+            <button>
+                    <FastForward className='fill-white size-5 md:!size-7' />
                 </button>
                 <button
-                    className='!size-20 '
+                    className='!size-[65px] md:!size-20 '
                     onClick={togglePlay}
                 >
                     {isPlaying ? <PauseIcon /> : <PlayIcon />}
                 </button>
                 <button>
-                    <Forward />
-                    {/* Forward */}
+                    <FastForward className='fill-white rotate-180 size-5 md:!size-7' />
                 </button>
             </div>
         </div>

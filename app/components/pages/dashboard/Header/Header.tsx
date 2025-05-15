@@ -10,9 +10,7 @@ const Header = () => {
   return (
     <header className='container py-2.5 w-full mx-auto flex items-center justify-between'>
       <div>
-        <BorderedButton onClick={() => {
-          console.log("TEST")
-        }}>
+        <BorderedButton>
           نهضت <br />
           تدبر
         </BorderedButton>
