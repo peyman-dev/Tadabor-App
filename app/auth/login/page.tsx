@@ -1,8 +1,10 @@
 "use client"
 
-import { login } from '@/app/actions'
+import { login, sendOTP } from '@/app/actions'
 import PrimaryButton from '@/app/components/common/buttons/primary-button'
+import { useModal } from '@/app/components/common/modal'
 import { AuthInput } from '@/app/components/pages/auth/common/auth-input'
+import OTPModal from '@/app/components/pages/auth/otp-modal'
 import PasswordIcon from '@/app/components/svgs/PasswordIcon'
 import PhoneIcon from '@/app/components/svgs/PhoneIcon'
 import { LoginPayloadType } from '@/app/core/types'
@@ -18,6 +20,8 @@ interface AuthValuesType {
     password: string
 }
 
+type LoginMethodType = "PASSWORD" | "OTP"
+
 const LoginPage = () => {
     const { setValue, formState: { errors }, watch, handleSubmit, register } = useForm({
         defaultValues: {
@@ -27,25 +31,49 @@ const LoginPage = () => {
         resolver: zodResolver(loginValidation)
     })
 
+    const [loginMethod, setLoginMethod] = useState<LoginMethodType>("PASSWORD")
+
     const [isLoading, setIsLoading] = useState(false)
 
-    const submitted = async (values: AuthValuesType) => {
+    const { openUI, closeUI } = useModal()
 
-        try {
-            setIsLoading(true)
-            const payload: LoginPayloadType = {
-                Phone: String(values.phoneNumber),
+    const submitted = async (values: AuthValuesType) => {
+        if (loginMethod === "PASSWORD") {
+            try {
+                setIsLoading(true)
+                const payload: LoginPayloadType = {
+                    Phone: String(values.phoneNumber),
+                }
+
+                const res = await login(payload)
+                console.log(res)
+                toast.error(res.message)
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setIsLoading(false)
             }
-            
-            const res = await login(payload)
-            console.log(res)
-            toast.error(res.message)
-        } catch (error) {
-            console.log(error)   
-        } finally {
-            setIsLoading(false)
+        } else {
+            try {
+                setIsLoading(true)
+
+                const res = await sendOTP(String("0" + values.phoneNumber))
+                
+                if (res.erroCode == 200) {
+                    openUI(<OTPModal phone={String("0" + values.phoneNumber)}/>)
+                }
+
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setIsLoading(false)
+            }
         }
 
+    }
+
+    const handleTabSwitch = () => {
+        if (loginMethod === "PASSWORD") setLoginMethod("OTP"); else setLoginMethod("PASSWORD")
     }
 
     return (
@@ -60,15 +88,26 @@ const LoginPage = () => {
                 <AuthInput error={errors.phoneNumber?.message} icon={<PhoneIcon />} type='number' onChange={(value: any) => {
                     setValue("phoneNumber", value)
                 }} isRequired label="شماره همراه" />
+                {loginMethod == "PASSWORD" ?
+                    <AuthInput error={errors.password?.message} icon={<PasswordIcon />} type='password' onChange={(value: any) => {
+                        setValue("password", value)
+                    }} isRequired label="گذرواژه" />
+                    : null
+                }
 
-                <AuthInput error={errors.password?.message} icon={<PasswordIcon />} type='password' onChange={(value: any) => {
-                    setValue("password", value)
-                }} isRequired label="گذرواژه" />
+                <div className='flex justify-center text-xs  text-primary items-center gap-1'>
+                    <button className='cursor-pointer' type='button' onClick={handleTabSwitch}>
+                        {loginMethod === "PASSWORD" ?
+                            "ورود با کد یک بار مصرف" : "ورود با گذرواژه"
+                        }
+                    </button>
 
+                </div>
             </main>
             <footer className="flex items-center justify-center">
-                <PrimaryButton loading={isLoading} type="submit" className='min-w-[242px] h-[50px] rounded-[30px] mx-auto'>
-                    وارد شوید
+                <PrimaryButton loading={isLoading} type="submit" className='min-w-[242px] h-[50px] rounded-[30px] mx-auto text-sm'>
+                    {loginMethod === "PASSWORD" ? "وارد شوید" : "ارسال کد تائید"
+                    }
                 </PrimaryButton>
             </footer>
         </form>

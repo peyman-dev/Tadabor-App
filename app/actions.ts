@@ -1,6 +1,11 @@
 import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
-import { ApiResponseType, LoginPayloadType, OTPValidationType, RegisterType } from "./core/types";
+import {
+  ApiResponseType,
+  LoginPayloadType,
+  OTPValidationType,
+  RegisterType,
+} from "./core/types";
 
 export const createSession = async (): Promise<ApiResponseType> => {
   const res = await sendRequest().get("/Login/CreateSession");
@@ -18,6 +23,24 @@ export const login = async (
   });
   const data = await res.data;
   return data;
+};
+
+export const sendOTP = async (Phone: string) => {
+  console.log(Phone);
+  try {
+    const res = await sendRequest().post("/Login/LoginPhone", null, {
+      headers: {
+        Phone,
+      },
+    });
+    const data = await res.data;
+    toast.success(data?.message);
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    toast.error(error?.message);
+    return error;
+  }
 };
 
 export const register = async (
@@ -45,22 +68,29 @@ export const register = async (
   }
 };
 
-export const verifyOTP = async (payload: OTPValidationType): Promise<ApiResponseType> => {
-  console.log( "0" + payload.Phone)
+export const verifyOTP = async (
+  payload: OTPValidationType
+): Promise<ApiResponseType> => {
+  console.log(0 + payload.Phone);
   try {
     const res = await sendRequest().post("/Login/LoginPhoneAcept", {
       headers: {
-        Phone: "0" + payload.Phone,
-        Code: payload.Code
-      }
-    })
-    
-    const data = await res.data
-    
-    return data
-    
+        Phone: payload.Phone,
+        Code: payload.Code,
+      },
+    });
+
+    const data = await res.data;
+
+    return data;
   } catch (error: any) {
     toast.error(error?.message);
-    return error 
+    return error;
   }
-}
+};
+
+export const getDailyData = async () => {
+  const cookieKey = crypto.randomUUID();
+  
+  
+};
