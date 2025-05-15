@@ -17,7 +17,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  await createSession();
+  const initSession = await createSession();
+  console.log(initSession)
 
   return (
     <html lang="fa-IR" dir="rtl">

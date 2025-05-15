@@ -4,7 +4,9 @@ import Cover from '../components/pages/dashboard/Main/Cover'
 import AudioPlayer from '../components/pages/dashboard/Main/AudioPlayer'
 import VerseSection from '../components/pages/dashboard/Main/Verse/VerseSection'
 
-const DashboardPage = () => {
+const DashboardPage = async () => {
+
+
   return (
     <Container>
       {/* <Cover /> */}

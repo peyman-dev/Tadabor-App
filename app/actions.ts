@@ -1,3 +1,4 @@
+"use server";
 import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
 import {
@@ -6,8 +7,11 @@ import {
   OTPValidationType,
   RegisterType,
 } from "./core/types";
+import { cookies } from "next/headers";
+// import { cookies as nextCookies } from "next/headers";
 
 export const createSession = async (): Promise<ApiResponseType> => {
+  console.log("SESSION CREATED");
   const res = await sendRequest().get("/Login/CreateSession");
   const data = await res.data;
   return data;
@@ -90,7 +94,26 @@ export const verifyOTP = async (
 };
 
 export const getDailyData = async () => {
-  const cookieKey = crypto.randomUUID();
+  // const generateUniqueID = await fetch("/api/set-device-id", { method: "GET" });
+  // console.log(generateUniqueID);
+  const deviceId = (await cookies()).get("deviceId")?.value;
   
+  // if (!deviceId) {
+  //   await fetch("/api/set-device-id/hello.ts")
+  // }
   
+  // await createSession();
+  try {
+    const res = await sendRequest("USER").get(
+      `/CallOfTheDay/GetDaily?UserID=638829301705529205`
+    , {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const data = await res.data;
+    return data;
+  } catch (error: any) {
+    return error;
+  }
 };
