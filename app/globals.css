@@ -26,12 +26,36 @@
   --color-light-teal: #02bad4;
   --color-dark: #3a3a3a;
 
+  --container-sm: 576px;
+  --container-md: 768px;
+  --container-lg: 992px;
+  --container-xl: 1200px;
 
-  
   --font-IRANSans-Light: "IRANSans-Light";
   --font-IRANSans-Regular: "IRANSans-Regular";
   --font-IRANSans-Medium: "IRANSans-Medium";
   --font-IRANSans-Bold: "IRANSans-Bold";
+}
+
+@utility container {
+  margin-inline: auto;
+  width: 90%!important;
+  
+  @variant sm {
+    width: 576px;
+  }
+
+  @variant md {
+    width: 768px;
+  }
+
+  @variant lg {
+    width: 992px;
+  }
+
+  @variant xl {
+    width: 1200px;
+  }
 }
 
 html,
@@ -50,11 +74,11 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: --color-gray;
-    transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 20px 20px #ffffff;
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: --color-gray;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #ffffff;
 }

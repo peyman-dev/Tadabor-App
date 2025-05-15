@@ -16,6 +16,7 @@
     "antd": "^5.25.1",
     "axios": "^1.9.0",
     "classnames": "^2.5.1",
+    "framer-motion": "^12.11.4",
     "local-ssl-proxy": "^2.0.5",
     "lucide-react": "^0.510.0",
     "next": "15.3.2",
@@ -23,6 +24,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.3",
     "react-hot-toast": "^2.5.2",
+    "react-player": "^2.16.0",
     "react-responsive": "^10.0.1",
     "zod": "^3.24.4",
     "zustand": "^5.0.4"

@@ -5,7 +5,6 @@ import { AuthInput } from '../../components/pages/auth/common/auth-input'
 import UserIcon from '@/app/components/svgs/UserIcon'
 import { useForm } from 'react-hook-form'
 import PhoneIcon from '@/app/components/svgs/PhoneIcon'
-import PasswordIcon from '@/app/components/svgs/PasswordIcon'
 import PrimaryButton from '@/app/components/common/buttons/primary-button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { registerValidation } from '@/app/core/validations/auth'
@@ -40,7 +39,7 @@ const RegisterPage = () => {
       }
 
       if (res.erroCode == 200) {
-        openUI(<OTPModal />)
+        openUI(<OTPModal phone={values.phone} />)
       }
 
     } catch (error) {
@@ -58,7 +57,7 @@ const RegisterPage = () => {
         </p>
       </header>
       <main className='space-y-[35.5px]'>
-        <AuthInput error={errors.phone?.message} icon={<PhoneIcon />} type='number' onChange={(value: any) => {
+        <AuthInput error={errors.phone?.message} icon={<PhoneIcon />} type='tel' onChange={(value: string) => {
           setValue("phone", value)
         }} isRequired label="شماره همراه" />
 
@@ -66,7 +65,7 @@ const RegisterPage = () => {
           setValue("name", value)
         }} isRequired label="نام" />
 
-        <AuthInput error={errors.family?.message} icon={<UserIcon />} onChange={(value: any) => {
+        <AuthInput error={errors.family?.message} icon={<UserIcon />} onChange={(value: string) => {
           setValue("family", value)
         }} isRequired label="نام خانوادگی" />
 

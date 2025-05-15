@@ -24,3 +24,8 @@ export type ApiResponseType = {
     actor: string | null;
   };
 };
+
+export type OTPValidationType = {
+  Phone: RegisterType["phone"],
+  Code: string
+}
