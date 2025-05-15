@@ -1,9 +1,11 @@
 "use client"
 
+import { login } from '@/app/actions'
 import PrimaryButton from '@/app/components/common/buttons/primary-button'
 import { AuthInput } from '@/app/components/pages/auth/common/auth-input'
 import PasswordIcon from '@/app/components/svgs/PasswordIcon'
 import PhoneIcon from '@/app/components/svgs/PhoneIcon'
+import { LoginPayloadType } from '@/app/core/types'
 // import UserIcon from '@/app/components/svgs/UserIcon'
 import { loginValidation } from '@/app/core/validations/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -28,8 +30,22 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false)
 
     const submitted = async (values: AuthValuesType) => {
-        // setIsLoading(true)
-        
+
+        try {
+            setIsLoading(true)
+            const payload: LoginPayloadType = {
+                Phone: String(values.phoneNumber),
+            }
+            
+            const res = await login(payload)
+            console.log(res)
+            toast.error(res.message)
+        } catch (error) {
+            console.log(error)   
+        } finally {
+            setIsLoading(false)
+        }
+
     }
 
     return (

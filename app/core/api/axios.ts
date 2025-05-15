@@ -2,8 +2,17 @@ import axios from "axios";
 
 type API_METHOD = "USER" | "FILES";
 
-export const sendRequest = (method: API_METHOD = "USER") =>
-  axios.create({
-    baseURL:
-      method == "USER" ? process.env.USER_BASE_URL : process.env.FILES_BASE_URL,
-  });
+const getBaseUrl = (type: API_METHOD = "USER") => {
+  switch (type) {
+    case "USER":
+      return "https://api.tadaborzendegi.ir/usermanagement";
+    case "FILES":
+      return "https://api.tadaborzendegi.ir/mediaapi";
+    default:
+      return "https://api.tadaborzendegi.ir/usermanagement";
+  }
+};
+
+export const sendRequest = (type: API_METHOD = "USER") => axios.create({
+  baseURL: getBaseUrl(type),
+});
