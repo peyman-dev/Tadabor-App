@@ -5,14 +5,15 @@ type API_METHOD = "USER" | "FILES";
 const getBaseUrl = (type: API_METHOD = "USER") => {
   switch (type) {
     case "USER":
-      return "https://api.tadaborzendegi.ir/usermanagement";
+      return process.env.NEXT_PUBLIC_USER_BASE_URL;
     case "FILES":
-      return "https://api.tadaborzendegi.ir/mediaapi";
+      return process.env.NEXT_PUBLIC_FILES_BASE_URL;
     default:
-      return "https://api.tadaborzendegi.ir/usermanagement";
+      return process.env.NEXT_PUBLIC_USER_BASE_URL;
   }
 };
 
-export const sendRequest = (type: API_METHOD = "USER") => axios.create({
-  baseURL: getBaseUrl(type),
-});
+export const sendRequest = (type: API_METHOD = "USER") =>
+  axios.create({
+    baseURL: getBaseUrl(type),
+  });

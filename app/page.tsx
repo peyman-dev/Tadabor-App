@@ -1,8 +1,8 @@
 import React from 'react'
-import HomePage from './home/page'
+import DashboarPage from './dashboard/page'
 
 const page = () => {
-  return <HomePage />
+  return <DashboarPage />
 }
 
 export default page

@@ -1,5 +1,12 @@
+import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
-import { ApiResponseType, LoginPayloadType } from "./core/types";
+import { ApiResponseType, LoginPayloadType, RegisterType } from "./core/types";
+
+export const createSession = async (): Promise<ApiResponseType> => {
+  const res = await sendRequest().get("/Login/CreateSession");
+  const data = await res.data;
+  return data;
+};
 
 export const login = async (
   payload: LoginPayloadType
@@ -12,3 +19,32 @@ export const login = async (
   const data = await res.data;
   return data;
 };
+
+export const register = async (
+  payload: RegisterType
+): Promise<ApiResponseType> => {
+  try {
+    const res = await sendRequest().post(
+      "/Login/Register",
+      JSON.stringify({
+        phone: "0" + payload.phone,
+        name: payload.name,
+        family: payload.family,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await res.data;
+    return data;
+  } catch (error: any) {
+    toast.error(error?.message);
+    return error;
+  }
+};
+
+export const verifyOTP = async () => {
+  
+}

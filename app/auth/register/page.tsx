@@ -1,34 +1,50 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AuthInput } from '../../components/pages/auth/common/auth-input'
 import UserIcon from '@/app/components/svgs/UserIcon'
 import { useForm } from 'react-hook-form'
 import PhoneIcon from '@/app/components/svgs/PhoneIcon'
 import PasswordIcon from '@/app/components/svgs/PasswordIcon'
 import PrimaryButton from '@/app/components/common/buttons/primary-button'
-import { RegisterType } from '@/app/core/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { registerValidation } from '@/app/core/validations/auth'
+import { register } from '@/app/actions'
+import toast from 'react-hot-toast'
+import { useModal } from '@/app/components/common/modal'
+import OTPModal from '@/app/components/pages/auth/otp-modal'
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { setValue, handleSubmit, formState: { errors }, getValues } = useForm({
     defaultValues: {
-      phone: "",
-      name: "",
-      family: "",
+      "phone": "",
+      "name": "",
+      "family": "",
     },
     resolver: zodResolver(registerValidation)
   })
 
+  const { closeUI, openUI } = useModal()
+
+  useEffect(() => {
+
+  }, [])
 
   const submitted = async (values: any) => {
     try {
       setIsLoading(true)
-      // const res = await 
+      const res = await register(values)
+      if (res.erroCode == 206) {
+        toast.error(res.message)
+      }
+
+      if (res.erroCode == 200) {
+        openUI(<OTPModal />)
+      }
+
     } catch (error) {
-      
+
     } finally {
       setIsLoading(false)
     }
@@ -56,7 +72,7 @@ const RegisterPage = () => {
 
       </main>
       <footer className="flex items-center justify-center">
-        <PrimaryButton disabled={isLoading} className='min-w-[242px] h-[50px] rounded-[30px] mx-auto' type='submit'>
+        <PrimaryButton loading={isLoading} className='min-w-[242px] h-[50px] rounded-[30px] mx-auto' type='submit'>
           ثبت نام
         </PrimaryButton>
       </footer>

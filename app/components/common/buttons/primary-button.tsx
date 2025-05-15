@@ -14,7 +14,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({ children, loading, classN
             type="button"
             {...rest}
             className={cn(
-                'bg-gradient-to-r from-[#E6C472] to-[#CDA84D] text-white cursor-pointer',
+                'bg-gradient-to-r min-w-[268px] h-[50px] rounded-[30px] from-[#E6C472] to-[#CDA84D] text-white cursor-pointer',
                 className, {
                 "opacity-70": loading
             }
