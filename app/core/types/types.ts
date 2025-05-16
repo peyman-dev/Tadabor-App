@@ -72,6 +72,90 @@ interface Sentence {
   sentenceTranslates: SentenceTranslate[];
 }
 
+export interface HolyResponse {
+  data: HolyDataType;
+  statuscode: number;
+  message: string;
+  details: null;
+}
+
+export interface HolyDataType {
+  informationSentences: InformationSentence[];
+  sentence: Sentence;
+  audioSentenceDTO: AudioSentenceDTO[];
+  audio: Audio;
+  translate: null;
+}
+
+interface InformationSentence {
+  id: number;
+  idinformation: number;
+  idsentence: number;
+  value: string;
+  information: Information;
+}
+
+interface Information {
+  id: number;
+  value: string;
+}
+
+interface Sentence {
+  id: number;
+  idseason: number;
+  index: number;
+  document: string;
+  wordByWord: boolean;
+  translateDocumnt: string;
+  bookIndex: number;
+  seasonName: string;
+  sentenceFavorite: null;
+  sentenceSeen: null;
+  sentenceArchive: null;
+  words: Word[];
+  wordTranslates: null;
+  userSentences: null;
+  documentSentences: null;
+  audios: null;
+  sentenceTranslates: SentenceTranslate[];
+  informationSentence: null;
+}
+
+interface Word {
+  id: number;
+  idsentence: number;
+  index: number;
+  value: string;
+}
+
+interface SentenceTranslate {
+  id: number;
+  idseasonTranslate: number;
+  idsentence: number;
+  document: string;
+  wordByWord: boolean;
+  index: number;
+  wordTranslates: null;
+}
+
+interface AudioSentenceDTO {
+  id: number;
+  idaduio: number;
+  idsentence: number;
+  startPage: number;
+  endPage: number;
+  duration: number;
+  audioWords: AudioWord[];
+}
+
+interface AudioWord {
+  id: number;
+  idaduioSentence: number;
+  idword: number;
+  startPage: number;
+  endPage: number;
+}
+
 interface Audio {
   id: number;
   idbook: number;
@@ -81,16 +165,15 @@ interface Audio {
   audioSentences: null;
 }
 
-interface Translate {
-  language: string;
-  value: string;
-}
-
-// تعریف تایپ اصلی برای InformationSentences
-export interface HolyType {
+export interface MediaType {
   id: number;
-  Information?: Information; // optional چون همه‌ی آیتم‌ها این فیلد رو ندارن
-  sentence?: Sentence; // optional
-  audio?: Audio; // optional
-  translate?: Translate[]; // optional
+  idMediaType: number;
+  fileName: string;
+  unixTimeUpload: number;
+  unixTimeLastRecent: number;
+  uploadStatus: boolean;
+  fileSize: number;
+  partSize: number;
+  pathMain: string | null;
+  duration: number;
 }

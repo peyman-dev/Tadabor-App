@@ -4,6 +4,7 @@ import { sendRequest } from "./core/api/axios";
 import {
   ApiResponseType,
   LoginPayloadType,
+  MediaType,
   OTPValidationType,
   RegisterType,
 } from "./core/types/types";
@@ -13,7 +14,6 @@ import {
 export const createSession = async (): Promise<ApiResponseType> => {
   const res = await sendRequest().get("/Login/CreateSession");
   const data = await res.data;
-  console.log("Session Created")
   return data;
 };
 
@@ -95,7 +95,7 @@ export const verifyOTP = async (
     if (data.erroCode == 200) {
       localStorage.setItem("userData", JSON.stringify(data.data));
     } else {
-      toast.error(data.message)
+      toast.error(data.message);
     }
 
     return data;
@@ -107,23 +107,33 @@ export const verifyOTP = async (
 };
 
 export const getDailyData = async () => {
-  // const generateUniqueID = await fetch("/api/set-device-id", { method: "GET" });
-  // console.log(generateUniqueID);
-  // const deviceId = (await cookies()).get("deviceId")?.value;
+  await createSession();
 
-  // if (!deviceId) {
-  //   await fetch("/api/set-device-id/hello.ts");
-  // }
-
-  // await createSession();
   try {
-    const res = await sendRequest("USER").get(
-      `/CallOfTheDay/GetDaily?UserID=638829301705529205`,
-      {}
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=9329523958`,
+      {
+        method: "GET",
+      }
     );
-    const data = await res.data;
+    const data = await res.json();
     return data;
   } catch (error: any) {
     return error;
   }
 };
+
+export const getMedia = async (mediaId: string) => {
+  const res = await sendRequest("FILES").get("/api/v1/Media/Get", {
+    headers: {
+      IDMedia: mediaId,
+    },
+  });
+
+  const data = await res.data;
+  return data?.data as MediaType;
+};
+
+export const mediaStreamUrl = (mediaId: string) => {
+  return `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?IDMedia=${mediaId}`;
+}
