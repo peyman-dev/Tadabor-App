@@ -39,7 +39,7 @@ const NameHolder: React.FC<NameHolderProps> = memo((props) => {
             </svg>
         )
     } else {
-        return (<svg {...props}  xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="463" height="56" viewBox="0 0 463 56">
+        return (<svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="463" height="56" viewBox="0 0 463 56">
             <defs>
                 <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
                     <stop offset="0" stopColor="#a4e3f0" />

@@ -26,7 +26,7 @@ export type ApiResponseType = {
 };
 
 export type OTPValidationType = {
-  Phone: RegisterType["phone"],
+  Phone: string,
   Code: string
 }
 

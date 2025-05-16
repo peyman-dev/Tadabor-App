@@ -56,9 +56,7 @@ const LoginPage = () => {
         } else {
             try {
                 setIsLoading(true)
-                console.log(values.phoneNumber)
                 const res = await sendOTP(String("0" + values.phoneNumber))
-                
                 if (res.erroCode == 200) {
                     openUI(<OTPModal phone={String("0" + values.phoneNumber)}/>)
                 }

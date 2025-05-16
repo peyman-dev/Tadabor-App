@@ -1,5 +1,5 @@
-"use server";
-// import toast from "react-hot-toast";
+// "use server";
+import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
 import {
   ApiResponseType,
@@ -7,7 +7,7 @@ import {
   OTPValidationType,
   RegisterType,
 } from "./core/types";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 // import { cookies as nextCookies } from "next/headers";
 
 export const createSession = async (): Promise<ApiResponseType> => {
@@ -38,11 +38,11 @@ export const sendOTP = async (Phone: string) => {
       },
     });
     const data = await res.data;
-    // toast.success(data?.message);
+    toast.success(data?.message);
     return data;
   } catch (error: any) {
     console.log(error);
-    // toast.error(error?.message);
+    toast.error(error?.message);
     return error;
   }
 };
@@ -67,7 +67,7 @@ export const register = async (
     const data = await res.data;
     return data;
   } catch (error: any) {
-    // toast.error(error?.message);
+    toast.error(error?.message);
     return error;
   }
 };
@@ -75,38 +75,43 @@ export const register = async (
 export const verifyOTP = async (
   payload: OTPValidationType
 ): Promise<ApiResponseType> => {
-
-  await createSession()
   try {
+    const cookie = "test"; // باید از درخواست لاگین بگیرید
+    console.log("Full URL:", `${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`);
+    console.log("Sending request with:", { Phone: payload.Phone, Code: payload.Code });
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`, {
       method: "POST",
       headers: {
         Phone: payload.Phone,
         Code: payload.Code,
+        "Accept": "*/*", // مشابه Postman
+        "User-Agent": "Mozilla/5.0 (compatible; MyApp/1.0)", // یه User-Agent معتبر
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Cookie": cookie || "", // کوکی رو اینجا اضافه کنید
       },
     });
 
-    console.log(res)
 
     const data = await res.json();
-
-    console.log(data)
-    
+    console.log("Response Data:", data);
     return data;
   } catch (error: any) {
-    // toast.error(error?.message);
-    return error;
+    console.error("ERROR:", error);
+    toast.error(error?.message || "مشکلی پیش آمده است");
+    throw error;
   }
 };
 
 export const getDailyData = async () => {
   // const generateUniqueID = await fetch("/api/set-device-id", { method: "GET" });
   // console.log(generateUniqueID);
-  const deviceId = (await cookies()).get("deviceId")?.value;
+  // const deviceId = (await cookies()).get("deviceId")?.value;
 
-  if (!deviceId) {
-    await fetch("/api/set-device-id/hello.ts");
-  }
+  // if (!deviceId) {
+  //   await fetch("/api/set-device-id/hello.ts");
+  // }
 
   // await createSession();
   try {

@@ -3,6 +3,7 @@ import Container from '../components/pages/dashboard/Main/Container'
 import Cover from '../components/pages/dashboard/Main/Cover'
 import AudioPlayer from '../components/pages/dashboard/Main/AudioPlayer'
 import VerseSection from '../components/pages/dashboard/Main/Verse/VerseSection'
+import Description from '../components/pages/dashboard/Main/Description/Description'
 
 const DashboardPage = async () => {
 
@@ -12,6 +13,7 @@ const DashboardPage = async () => {
       {/* <Cover /> */}
       <AudioPlayer />
       <VerseSection />
+      <Description />
     </Container>
   )
 }

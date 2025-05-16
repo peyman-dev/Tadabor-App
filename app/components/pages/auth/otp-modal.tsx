@@ -11,6 +11,10 @@ const OTPModal = ({ phone }: { phone: String }) => {
     const handleSubmit = async () => {
         try {
             setIsLoading(true)
+            console.log({
+                Code: String(OTP),
+                Phone: String(phone)
+            })
             const res = await verifyOTP({
                 Code: String(OTP),
                 Phone: String(phone)
@@ -19,8 +23,6 @@ const OTPModal = ({ phone }: { phone: String }) => {
             console.log(res)
             
         } catch (error) {
-                console.log('ERROR')
-                console.log(error)
         } finally {
             setIsLoading(false)
         }
@@ -40,7 +42,9 @@ const OTPModal = ({ phone }: { phone: String }) => {
                 <div dir="ltr" className='max-w-[200px]'>
                     <Input.OTP onChange={(v: string) => {
                         setOTP(v)
-                        handleSubmit()
+                        if (OTP) {
+                            handleSubmit()
+                        }
                     }} type='number' length={4} />
                 </div>
                 <PrimaryButton loading={isLoading} onClick={handleSubmit}  className=''>
