@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { AuthShapesSVG } from '../components/svgs/auth-shapes'
+import { AuthShapesSVG } from '../components/pages/dashboard/Main/svgs/auth-shapes'
 import BackButton from '../components/common/buttons/back-button'
 import AuthLogo from '../components/pages/auth/Logo'
 import SignInLink from '../components/pages/auth/common/sign-in-link'

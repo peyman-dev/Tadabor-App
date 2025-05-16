@@ -1,5 +1,5 @@
 import BorderedButton from '@/app/components/common/buttons/bordered-button'
-import ProfileIcon from '@/app/components/svgs/ProfileIcon'
+import ProfileIcon from '@/app/components/pages/dashboard/Main/svgs/ProfileIcon'
 import React from 'react'
 
 const Profile = () => {

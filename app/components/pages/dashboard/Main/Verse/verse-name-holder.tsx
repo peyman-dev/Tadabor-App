@@ -1,6 +1,6 @@
 "use client"
 
-import NameHolder from '@/app/components/svgs/name-holder'
+import NameHolder from '@/app/components/pages/dashboard/Main/svgs/name-holder'
 import { useHolyStore } from '@/app/core/stores/holy.store'
 import React from 'react'
 

@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react'
 import { AuthInput } from '../../components/pages/auth/common/auth-input'
-import UserIcon from '@/app/components/svgs/UserIcon'
+import UserIcon from '@/app/components/pages/dashboard/Main/svgs/UserIcon'
 import { useForm } from 'react-hook-form'
-import PhoneIcon from '@/app/components/svgs/PhoneIcon'
+import PhoneIcon from '@/app/components/pages/dashboard/Main/svgs/PhoneIcon'
 import PrimaryButton from '@/app/components/common/buttons/primary-button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { registerValidation } from '@/app/core/validations/auth'

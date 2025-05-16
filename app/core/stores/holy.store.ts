@@ -11,4 +11,16 @@ export const useHolyStore = create<HolyStoreType>((set) => ({
 
   media: null,
   setMedia: (media: MediaType) => set({ media }),
+
+  currentTime: 0,
+  setCurrentTime: (time: number) => set({ currentTime: time }),
+
+  endAt: 0,
+  setEndAt: (time: number) => set({ endAt: time }),
+
+  isPlaying: false,
+  setIsPlaying: (bool: boolean) => set({ isPlaying: bool }),
+
+  startFrom: 0,
+  setStartFrom:   (time: number) => set({ startFrom: time }),
 }));

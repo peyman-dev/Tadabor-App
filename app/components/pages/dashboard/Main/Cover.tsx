@@ -6,8 +6,6 @@ import React from 'react'
 const Cover = () => {
   const { media } = useHolyStore()
 
-  console.log(media)
-
 
   return (
     <div className='w-full h-[267.44px] md:h-[496px] p-5 overflow-hidden bg-[#9FE1EF] rounded-[50px]'>
