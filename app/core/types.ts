@@ -34,100 +34,63 @@ export type LoginMethodType = "OTP" | "PASSWORD"
 
 
 
-export interface HolyObjectType {
-  value?: string;
-  isInformation?: boolean;
-  id?: number;
-  document?: string;
-  wordByWord?: boolean;
-  trans?: string;
-  bookIndex?: number;
-  seasonName?: string;
-  sentenceSeen?: null;
-  sentenceArchive?: null;
-  word?: any[];
-  index?: number;
-  idsentence?: number;
-  idsentenceTranslates?: number;
-  wordTranslates?: null;
-  userSentences?: null;
-  documentSentences?: any[];
-  information_sentences?: InformationSentence[];
-  sentence?: Sentence;
-  audioSentenceDTO?: AudioSentenceDTO[];
-  audio?: Audio[];
-  translate?: null;
-  endPage?: number;
-  quranVerse?: QuranVerse; // اضافه کردن آیه قرآن
-}
-
-interface InformationSentence {
-  id: number;
-  idsentence: number;
-  value: string;
-  information: Information;
-  idInformation?: number;
-}
-
+// تعریف تایپ‌های فرعی برای بخش‌های مختلف
 interface Information {
-  id?: number;
-  value?: string;
-}
-
-interface Sentence {
   id: number;
-  idseason: number;
-  index: number;
-  document: string;
-  wordByWord: boolean;
-  trans: string;
-  bookIndex: number;
-  seasonName: string;
-  sentenceFavorite?: null;
-  sentenceSeen?: null;
-  sentenceArchive?: null;
-  words?: Word[];
+  sentence: number;
   value: string;
-  wordTranslates?: null;
-  userSentences?: null;
-  documentSentences?: null;
-  sentenceTranslates?: any[];
 }
 
 interface Word {
   id: number;
-  idsentence: number;
+  sentence: number;
   index: number;
   value: string;
 }
 
-interface AudioSentenceDTO {
+interface SentenceTranslate {
   id: number;
-  idAudioSentence?: number;
-  idSeason?: number;
-  startPage?: number;
-  endPage?: number;
-  duration?: number;
-  audioWords?: any[];
-  idWord?: number;
+  sentence: number;
+  document: string;
+  word: boolean;
+  index: number;
+}
+
+interface Sentence {
+  id: number;
+  index: number;
+  document: string;
+  word: boolean;
+  translateDocument: boolean;
+  bookIndex: number;
+  sentenceIndex: number | null;
+  sentenceArchive: null;
+  words: Word[];
+  wordTranslates: null;
+  userSentences: null;
+  documentSentences: null;
+  sentenceTranslates: SentenceTranslate[];
 }
 
 interface Audio {
   id: number;
-  idBook: number;
-  idSeason: number;
+  idbook: number;
+  idseason: number;
   idmedia: number;
   totalTime: number;
-  audioSentences?: null;
+  audioSentences: null;
 }
 
-interface QuranVerse {
+interface Translate {
+  language: string;
+  value: string;
+}
+
+// تعریف تایپ اصلی برای InformationSentences
+export interface HolyType {
   id: number;
-  surah: number;
-  verseNumber: number;
-  text: string;
-  translation: string;
-  transliteration: string;
-  audioUrl: string;
-  tafsir: string;
+  Information?: Information; // optional چون همه‌ی آیتم‌ها این فیلد رو ندارن
+  sentence?: Sentence; // optional
+  audio?: Audio; // optional
+  translate?: Translate[]; // optional
 }
