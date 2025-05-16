@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { createSession } from "./actions";
 import { ModalProvider } from "./components/common/modal";
+import AuthenticationProvider from "./core/providers/auth-provider";
 
 
 export const metadata: Metadata = {
@@ -23,10 +24,12 @@ export default async function RootLayout({
     <html lang="fa-IR" dir="rtl">
       <body
       >
-        <ModalProvider>
-          <Toaster />
-          {children}
-        </ModalProvider>
+        <AuthenticationProvider>
+          <ModalProvider>
+            <Toaster />
+            {children}
+          </ModalProvider>
+        </AuthenticationProvider>
       </body>
     </html>
   );

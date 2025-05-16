@@ -11,7 +11,6 @@ import {
 // import { cookies as nextCookies } from "next/headers";
 
 export const createSession = async (): Promise<ApiResponseType> => {
-  console.log("SESSION CREATED");
   const res = await sendRequest().get("/Login/CreateSession");
   const data = await res.data;
   return data;
@@ -76,26 +75,28 @@ export const verifyOTP = async (
   payload: OTPValidationType
 ): Promise<ApiResponseType> => {
   try {
-    const cookie = "test"; // باید از درخواست لاگین بگیرید
-    console.log("Full URL:", `${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`);
-    console.log("Sending request with:", { Phone: payload.Phone, Code: payload.Code });
+    await createSession();
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`, {
-      method: "POST",
-      headers: {
-        Phone: payload.Phone,
-        Code: payload.Code,
-        "Accept": "*/*", // مشابه Postman
-        "User-Agent": "Mozilla/5.0 (compatible; MyApp/1.0)", // یه User-Agent معتبر
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
-        "Cookie": cookie || "", // کوکی رو اینجا اضافه کنید
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`,
+      {
+        method: "POST",
+        headers: {
+          Phone: payload.Phone,
+          Code: payload.Code,
+        },
+      }
+    );
 
+    const data: ApiResponseType = await res.json();
 
-    const data = await res.json();
-    console.log("Response Data:", data);
+    // Save the data to localStorage
+    if (data.erroCode == 200) {
+      localStorage.setItem("userData", JSON.stringify(data.data));
+    } else {
+      toast.error(data.message)
+    }
+
     return data;
   } catch (error: any) {
     console.error("ERROR:", error);
@@ -120,6 +121,7 @@ export const getDailyData = async () => {
       {}
     );
     const data = await res.data;
+    console.log(data)
     return data;
   } catch (error: any) {
     return error;

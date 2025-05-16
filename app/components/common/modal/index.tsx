@@ -1,7 +1,8 @@
 "use client"
 
 import React, { createContext, useContext, useState, ReactNode } from 'react'
-import { Modal } from 'antd'
+import { Modal, Drawer } from 'antd'
+import useIsMobile from '@/app/core/hooks/use-is-mobile'
 
 interface ModalContextType {
   openUI: (content: ReactNode) => void
@@ -11,6 +12,7 @@ interface ModalContextType {
 const ModalContext = createContext<ModalContextType | undefined>(undefined)
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
+  const isMobile = useIsMobile()
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState<ReactNode | null>(null)
 
@@ -27,14 +29,28 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ModalContext.Provider value={{ openUI, closeUI }}>
       {children}
-      <Modal
-        open={isOpen}
-        onCancel={closeUI}
-        footer={null}
-        className='max-w-[400px]'
-      >
-        {content}
-      </Modal>
+      {isMobile ? (
+        <Drawer
+          open={isOpen}
+          onClose={closeUI}
+          placement="bottom"
+          height="auto"
+          className="max-w-[400px] mx-auto"
+          headerStyle={{ display: 'none' }}
+          bodyStyle={{ padding: 0 }}
+        >
+          {content}
+        </Drawer>
+      ) : (
+        <Modal
+          open={isOpen}
+          onCancel={closeUI}
+          footer={null}
+          className="max-w-[400px]"
+        >
+          {content}
+        </Modal>
+      )}
     </ModalContext.Provider>
   )
 }

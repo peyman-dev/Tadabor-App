@@ -46,8 +46,12 @@ const LoginPage = () => {
                 }
 
                 const res = await login(payload)
-                console.log(res)
-                toast.error(res.message)
+
+                if (res.erroCode == 200) {
+                    toast.success(res.message)
+                } else {
+                    toast.error(res.message)
+                }
             } catch (error) {
                 console.log(error)
             } finally {
@@ -58,7 +62,7 @@ const LoginPage = () => {
                 setIsLoading(true)
                 const res = await sendOTP(String("0" + values.phoneNumber))
                 if (res.erroCode == 200) {
-                    openUI(<OTPModal phone={String("0" + values.phoneNumber)}/>)
+                    openUI(<OTPModal phone={String("0" + values.phoneNumber)} />)
                 }
 
             } catch (error: any) {

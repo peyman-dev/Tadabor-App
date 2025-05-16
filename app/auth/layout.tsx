@@ -9,7 +9,7 @@ const layout = ({ children }: { children: ReactNode }) => {
         <section>
             <BackButton />
             <AuthShapesSVG className='absolute -top-[68px] -right-[68px]' />
-            <main className='relative flex-col gap-[43px] w-dvw h-dvh flex items-center justify-center'>
+            <main className='relative flex-col gap-[43px] min-w-dvw min-h-dvh flex items-center justify-center'>
                 <AuthLogo />
                 {children}
                 <SignInLink />
