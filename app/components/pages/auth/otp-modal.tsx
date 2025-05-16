@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import PrimaryButton from "../../common/buttons/primary-button";
 import { verifyOTP } from "@/app/actions";
 import toast from "react-hot-toast";
-import { ApiResponseType } from "@/app/core/types";
+import { ApiResponseType } from "@/app/core/types/types";
 
 const OTPModal = ({ phone }: { phone: string }) => {
     const [isLoading, setIsLoading] = useState(false);

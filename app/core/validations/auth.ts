@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LoginMethodType } from "../types";
+import { LoginMethodType } from "../types/types";
 
 export const loginValidation = (method: LoginMethodType) =>
   z.object({

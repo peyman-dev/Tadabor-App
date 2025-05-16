@@ -1,20 +1,25 @@
-"use client"
-import { redirect, usePathname } from 'next/navigation'
+import { createSession } from '@/app/actions'
 import React, { ReactNode } from 'react'
+import Cookies from 'js-cookie'
 
-const AuthenticationProvider = ({ children }: { children: ReactNode }) => {
-    const path = usePathname()
+const AuthenticationProvider = async ({ children }: { children: ReactNode }) => {
 
+    const sessionExpiration = Cookies.get("sessionExpiration");
+    const currentTime = new Date().getTime();
+    const hundredMinutesInMs = 100 * 60 * 1000;
     
-    const handleAuthorization = () => {
-        // if (typeof window == "undefined") return;
-        
-        // const localData = localStorage?.getItem("accountInfo")
-        // if (!localData && !path.startsWith("/auth")) redirect('/auth/login');
+    if (!sessionExpiration) {
+        const expirationTime = currentTime + hundredMinutesInMs;
+        Cookies.set("sessionExpiration", String(expirationTime), { expires: 100 / (24 * 60) });
+        await createSession();
+    } else {
+        const expirationTime = parseInt(sessionExpiration);
+        if (currentTime >= expirationTime) {
+            const newExpirationTime = currentTime + hundredMinutesInMs;
+            Cookies.set("sessionExpiration", String(newExpirationTime), { expires: 100 / (24 * 60) });
+            await createSession();
+        }
     }
-
-    handleAuthorization()
-
 
     return (
         <>

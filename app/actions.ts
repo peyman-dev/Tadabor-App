@@ -6,13 +6,14 @@ import {
   LoginPayloadType,
   OTPValidationType,
   RegisterType,
-} from "./core/types";
+} from "./core/types/types";
 // import { cookies } from "next/headers";
 // import { cookies as nextCookies } from "next/headers";
 
 export const createSession = async (): Promise<ApiResponseType> => {
   const res = await sendRequest().get("/Login/CreateSession");
   const data = await res.data;
+  console.log("Session Created")
   return data;
 };
 
@@ -121,7 +122,6 @@ export const getDailyData = async () => {
       {}
     );
     const data = await res.data;
-    console.log(data)
     return data;
   } catch (error: any) {
     return error;
