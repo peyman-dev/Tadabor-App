@@ -10,7 +10,7 @@ const MediaSection = () => {
     return (
         <>
             <VideoStream />
-            <AudioPlayer src='' />
+            <AudioPlayer src='https://xx.bests-music.ir/Archive/H/Hayedeh/Hayedeh%20-%20Nashenideha/01-Delaye%20Ashegh.mp3' />
         </>
     )
 }

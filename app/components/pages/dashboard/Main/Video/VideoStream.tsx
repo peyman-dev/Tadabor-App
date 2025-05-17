@@ -2,18 +2,14 @@
 
 import { mediaStreamUrl } from '@/app/actions';
 import { useHolyStore } from '@/app/core/stores/holy.store';
-import { volume } from '@/app/core/utils';
 import { PauseIcon, PlayIcon } from 'lucide-react';
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const VideoStream = () => {
   const {
     media,
     isVideoPlaying,
     setIsVideoPlaying,
-    currentTime,
-    setCurrentTime,
-    setDuration,
     isFullScreen,
     setIsFullScreen,
     setIsAudioPlaying,
@@ -21,23 +17,7 @@ const VideoStream = () => {
   } = useHolyStore();
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const rafRef = useRef<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const updateProgress = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const newTime = video.currentTime;
-    if (isNaN(newTime) || !isFinite(newTime)) {
-      return;
-    }
-    setCurrentTime(newTime);
-
-    if (isVideoPlaying && video.duration) {
-      rafRef.current = requestAnimationFrame(updateProgress);
-    }
-  }, [setCurrentTime, isVideoPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -50,7 +30,6 @@ const VideoStream = () => {
     }
 
     const handleLoadedMetadata = () => {
-      setDuration(video.duration || 0);
       setError(null);
       if (isVideoPlaying) {
         video.play().catch(() => {
@@ -62,7 +41,6 @@ const VideoStream = () => {
 
     const handleEnded = () => {
       setIsVideoPlaying(false);
-      setCurrentTime(0);
     };
 
     const handleError = () => {
@@ -78,16 +56,13 @@ const VideoStream = () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', handleError);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
     };
-  }, [media?.id, setDuration, setIsVideoPlaying, isVideoPlaying]);
+  }, [media?.id, setIsVideoPlaying, isVideoPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-  
+
     if (isVideoPlaying) {
       // وقتی ویدیو پخش می‌شود، صوت را متوقف کنید
       setIsAudioPlaying(false);
@@ -98,36 +73,7 @@ const VideoStream = () => {
     } else if (!isVideoPlaying && !video.paused) {
       video.pause();
     }
-  }, [isVideoPlaying, setIsVideoPlaying, setIsAudioPlaying, error]);
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isVideoPlaying) return;
-
-    if (Math.abs(video.currentTime - currentTime) < 0.1) return;
-
-    if (isNaN(currentTime) || !isFinite(currentTime)) {
-      return;
-    }
-
-    video.currentTime = currentTime;
-  }, [currentTime, isVideoPlaying]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (isVideoPlaying) {
-      rafRef.current = requestAnimationFrame(updateProgress);
-    }
-
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [isVideoPlaying, updateProgress]);
-
-
+  }, [isVideoPlaying, setIsVideoPlaying, setIsAudioPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -152,10 +98,11 @@ const VideoStream = () => {
   return (
     <div className="w-full h-[267.44px] md:h-[496px] p-5 overflow-hidden bg-[#9FE1EF] rounded-[50px]">
       <div className="size-full overflow-hidden rounded-[50px] flex items-center justify-center relative">
-        {!isVideoPlaying ?
+        {!isVideoPlaying ? (
           <div
             onClick={() => setIsVideoPlaying(!isVideoPlaying)}
-            className="size-full absolute z-70 flex items-center justify-center bg-black/40 cursor-pointer">
+            className="size-full absolute z-70 flex items-center justify-center bg-black/40 cursor-pointer"
+          >
             <button
               className={`w-[65px] h-[65px] bg-gradient-to-t absolute from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-20 md:h-20 cursor-pointer z-60`}
             >
@@ -166,8 +113,7 @@ const VideoStream = () => {
               )}
             </button>
           </div>
-          : null
-        }
+        ) : null}
 
         {media?.id ? (
           error ? (

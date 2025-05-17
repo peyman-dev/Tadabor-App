@@ -51,10 +51,22 @@ const AudioPlayer = ({
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !src) return;
+
+    console.log('Setting audio src:', src);
+    if (audio.src !== src) {
+      audio.src = src;
+      audio.load(); // Force load when src changes
+    }
 
     const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
+      const newDuration = audio.duration;
+      console.log('Loaded metadata, duration:', newDuration);
+      if (!isNaN(newDuration) && isFinite(newDuration)) {
+        setDuration(newDuration);
+      } else {
+        setDuration(0);
+      }
     };
 
     const handleTimeUpdate = () => {
@@ -66,16 +78,26 @@ const AudioPlayer = ({
       setCurrentTime(0);
     };
 
+    const handleError = () => {
+      console.error('Error loading audio');
+      setIsAudioPlaying(false);
+      setDuration(0);
+    };
+
+    // Initial load attempt
+    audio.load();
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
     };
-  }, [setCurrentTime, setDuration, setIsAudioPlaying]);
+  }, [src, setCurrentTime, setDuration, setIsAudioPlaying]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -83,11 +105,14 @@ const AudioPlayer = ({
 
     if (isAudioPlaying) {
       setIsVideoPlaying(false);
-      audio.play().catch((error) => console.error('Audio playback failed:', error));
+      audio.play().catch((error) => {
+        console.error('Audio playback failed:', error);
+        setIsAudioPlaying(false);
+      });
     } else {
       audio.pause();
     }
-  }, [isAudioPlaying, setIsVideoPlaying]);
+  }, [isAudioPlaying, setIsVideoPlaying, setIsAudioPlaying]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -154,15 +179,13 @@ const AudioPlayer = ({
   const formatTime = useCallback((seconds: number) => {
     if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '0:00';
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
+    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 w-full">
-      <audio ref={audioRef} src={src} style={{ display: 'none' }} />
+    <div className="flex flex-col items-center justify-center gap-[42px] mt-[42px] w-full">
+      <audio ref={audioRef} preload="metadata" style={{ display: 'none' }} />
 
       <div className="flex flex-col gap-2 w-full max-w-md" dir="ltr">
         <div
@@ -175,23 +198,24 @@ const AudioPlayer = ({
             style={{ backgroundColor, height }}
           />
           <motion.div
-            className="absolute top-0 rounded-full h-full"
+            className="absolute top-0 rounded-full h-3 !bg-primary bottom-0"
             style={{ backgroundColor: primaryColor }}
             animate={{ width: `${progress}%` }}
             transition={{ type: 'tween', ease: 'linear', duration: 0.1 }}
           />
           <motion.div
-            className="absolute w-6 h-6 top-0 bottom-0 my-auto rounded-full"
+            className="absolute w-5 h-5 !top-1.5 !bottom-0 !my-auto rounded-full"
             style={{ background: primaryColor }}
             animate={{ left: `${progress}%`, x: '-50%' }}
             transition={{ type: 'tween', ease: 'linear', duration: 0.1 }}
           />
         </div>
-        <div className="flex justify-between text-sm text-gray-600">
+        <div className="flex justify-between text-sm text-gray-600 mt-4">
           <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{duration ? formatTime(duration) : '0:00'}</span>
         </div>
       </div>
+
       <div className="relative max-w-max flex items-center justify-center">
         <button
           className={`absolute -right-18 w-8 h-8 bg-transparent z-10 text-[#CDA84D] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
