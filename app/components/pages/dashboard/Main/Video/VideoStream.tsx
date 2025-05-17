@@ -3,18 +3,21 @@
 import { mediaStreamUrl } from '@/app/actions';
 import { useHolyStore } from '@/app/core/stores/holy.store';
 import { volume } from '@/app/core/utils';
+import { PauseIcon, PlayIcon } from 'lucide-react';
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 
-const Cover = () => {
+const VideoStream = () => {
   const {
     media,
-    isPlaying,
-    setIsPlaying,
+    isVideoPlaying,
+    setIsVideoPlaying,
     currentTime,
     setCurrentTime,
     setDuration,
-    isMuted,
-    volumeLevel,
+    isFullScreen,
+    setIsFullScreen,
+    setIsAudioPlaying,
+    playbackRate,
   } = useHolyStore();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -31,10 +34,10 @@ const Cover = () => {
     }
     setCurrentTime(newTime);
 
-    if (isPlaying && video.duration) {
+    if (isVideoPlaying && video.duration) {
       rafRef.current = requestAnimationFrame(updateProgress);
     }
-  }, [setCurrentTime, isPlaying]);
+  }, [setCurrentTime, isVideoPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -49,21 +52,21 @@ const Cover = () => {
     const handleLoadedMetadata = () => {
       setDuration(video.duration || 0);
       setError(null);
-      if (isPlaying) {
+      if (isVideoPlaying) {
         video.play().catch(() => {
-          setIsPlaying(false);
+          setIsVideoPlaying(false);
           setError('خطا در پخش ویدئو');
         });
       }
     };
 
     const handleEnded = () => {
-      setIsPlaying(false);
+      setIsVideoPlaying(false);
       setCurrentTime(0);
     };
 
     const handleError = () => {
-      setIsPlaying(false);
+      setIsVideoPlaying(false);
       setError('خطا در بارگذاری ویدئو');
     };
 
@@ -79,25 +82,26 @@ const Cover = () => {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [media?.id, setDuration, setIsPlaying, isPlaying]);
+  }, [media?.id, setDuration, setIsVideoPlaying, isVideoPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    if (isPlaying && video.paused && !error) {
+  
+    if (isVideoPlaying) {
+      // وقتی ویدیو پخش می‌شود، صوت را متوقف کنید
+      setIsAudioPlaying(false);
       video.play().catch(() => {
-        setIsPlaying(false);
+        setIsVideoPlaying(false);
         setError('خطا در پخش ویدئو');
       });
-    } else if (!isPlaying && !video.paused) {
+    } else if (!isVideoPlaying && !video.paused) {
       video.pause();
     }
-  }, [isPlaying, setIsPlaying, error]);
-
+  }, [isVideoPlaying, setIsVideoPlaying, setIsAudioPlaying, error]);
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || isPlaying) return;
+    if (!video || isVideoPlaying) return;
 
     if (Math.abs(video.currentTime - currentTime) < 0.1) return;
 
@@ -106,13 +110,13 @@ const Cover = () => {
     }
 
     video.currentTime = currentTime;
-  }, [currentTime]);
+  }, [currentTime, isVideoPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (isPlaying) {
+    if (isVideoPlaying) {
       rafRef.current = requestAnimationFrame(updateProgress);
     }
 
@@ -121,23 +125,50 @@ const Cover = () => {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [isPlaying, updateProgress]);
+  }, [isVideoPlaying, updateProgress]);
+
+
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (isMuted) {
-      video.volume = 0;
+    video.playbackRate = playbackRate;
+  }, [playbackRate]);
+
+  const toggleFullScreen = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (!isFullScreen) {
+      video.requestFullscreen();
+      setIsFullScreen(true);
     } else {
-      const vol = volume[volumeLevel as keyof typeof volume]?.volume ?? 1;
-      video.volume = vol;
+      document.exitFullscreen();
+      setIsFullScreen(false);
     }
-  }, [volumeLevel, isMuted]);
+  };
 
   return (
     <div className="w-full h-[267.44px] md:h-[496px] p-5 overflow-hidden bg-[#9FE1EF] rounded-[50px]">
-      <div className="size-full overflow-hidden rounded-[50px]">
+      <div className="size-full overflow-hidden rounded-[50px] flex items-center justify-center relative">
+        {!isVideoPlaying ?
+          <div
+            onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+            className="size-full absolute z-70 flex items-center justify-center bg-black/40 cursor-pointer">
+            <button
+              className={`w-[65px] h-[65px] bg-gradient-to-t absolute from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-20 md:h-20 cursor-pointer z-60`}
+            >
+              {isVideoPlaying ? (
+                <PauseIcon className="w-8 h-8 md:w-10 md:h-10" />
+              ) : (
+                <PlayIcon className="w-8 h-8 md:w-10 md:h-10" />
+              )}
+            </button>
+          </div>
+          : null
+        }
+
         {media?.id ? (
           error ? (
             <div className="size-full flex items-center justify-center text-red-500">
@@ -146,9 +177,10 @@ const Cover = () => {
           ) : (
             <video
               ref={videoRef}
-              muted={isMuted}
-              className="!size-full object-cover"
+              className="!size-full object-VideoStream"
+              onClick={() => setIsVideoPlaying(!isVideoPlaying)}
               preload="metadata"
+              onDoubleClick={toggleFullScreen}
             />
           )
         ) : (
@@ -161,4 +193,4 @@ const Cover = () => {
   );
 };
 
-export default Cover;
+export default VideoStream;

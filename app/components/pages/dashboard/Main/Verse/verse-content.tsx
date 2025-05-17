@@ -17,7 +17,7 @@ interface AudioWord {
 }
 
 const VerseContent = () => {
-  const { data, setIsPlaying, isPlaying, currentTime, setCurrentTime } = useHolyStore();
+  const { data, setIsAudioPlaying, isAudioPlaying, currentTime, setCurrentTime } = useHolyStore();
   const sentence = data?.sentence;
   const wordsTimelines = data?.audioSentenceDTO?.[0];
   const wordsAudioArray: AudioWord[] | undefined = wordsTimelines?.audioWords;
@@ -25,37 +25,35 @@ const VerseContent = () => {
   // State for tracking the active word index
   const [activeWordIndex, setActiveWordIndex] = useState<number>(0);
 
+  console.log(data);
+
   // Update active word based on currentTime
   useEffect(() => {
-    if (!wordsAudioArray || !isPlaying) return;
+    if (!wordsAudioArray || !isAudioPlaying) return;
 
-    // Convert currentTime (seconds) to milliseconds
     const currentTimeMs = currentTime * 1000;
 
-    // Find the word where currentTimeMs falls within its timeline
     const activeWord = wordsAudioArray.find((word) => {
       return currentTimeMs >= word.startPage && currentTimeMs < word.endPage;
     });
 
-    // Set activeWordIndex based on the found word, or reset to 0 if none found
     setActiveWordIndex(activeWord ? activeWord.idword : 0);
-  }, [currentTime, wordsAudioArray, isPlaying]);
+  }, [currentTime, wordsAudioArray, isAudioPlaying]);
 
   const RenderSentence = () => {
     const handleActiveWord = useCallback(
       (e: React.MouseEvent<HTMLSpanElement>) => {
         const clickedIndex = parseInt(e.currentTarget.dataset.wordid || '0', 10);
-        if (!wordsAudioArray) return; 
+        if (!wordsAudioArray) return;
 
         const clickedWord = wordsAudioArray.find((word: AudioWord) => word.idword === clickedIndex);
         if (clickedWord) {
-          // Convert startPage (ms) to seconds for setCurrentTime
           setCurrentTime(clickedWord.startPage / 1000);
           setActiveWordIndex(clickedIndex); // Update active word
-          if (!isPlaying) setIsPlaying(true); // Start playing if not already
+          if (!isAudioPlaying) setIsAudioPlaying(true); // Start playing audio if not already
         }
       },
-      [wordsAudioArray, isPlaying, setCurrentTime, setIsPlaying]
+      [wordsAudioArray, isAudioPlaying, setCurrentTime, setIsAudioPlaying]
     );
 
     switch (sentence?.wordByWord) {

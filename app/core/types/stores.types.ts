@@ -10,24 +10,38 @@ export interface HolyStoreType {
   media: MediaType | null;
   setMedia: (media: MediaType) => void;
 
-  currentTime: number,
+  currentTime: number;
   setCurrentTime: (currentTime: number) => void;
 
-  isPlaying: boolean,
-  setIsPlaying: (isPlaying: boolean) => void;
+  isAudioPlaying: boolean; // برای صوت
+  setIsAudioPlaying: (isAudioPlaying: boolean) => void;
 
-  startFrom: number,
+  isVideoPlaying: boolean; // برای ویدیو
+  setIsVideoPlaying: (isVideoPlaying: boolean) => void;
+
+  startFrom: number;
   setStartFrom: (startFrom: number) => void;
 
-  endAt: number,
+  endAt: number;
   setEndAt: (endAt: number) => void;
 
-  duration: number,
+  duration: number;
   setDuration: (duration: number) => void;
 
   isMuted: boolean;
-  setIsMuted: (bool: boolean) => void;
+  setIsMuted: (isMuted: boolean) => void;
 
-  volumeLevel: number,
+  volumeLevel: number;
   setVolumeLevel: (volumeLevel: number) => void;
+
+  // ویژگی‌های ویدیویی
+  isFullScreen: boolean;
+  setIsFullScreen: (isFullScreen: boolean) => void;
+
+  videoQuality: '240p' | '360p' | '480p' | '720p' | '1080p' | '1440p' | '4k'; // تایپ مشخص برای کیفیت ویدیو
+  setVideoQuality: (videoQuality: '240p' | '360p' | '480p' | '720p' | '1080p' | '1440p' | '4k') => void;
+
+  // ویژگی‌های اضافی برای صوت/ویدیو
+  playbackRate: number; // سرعت پخش (مثل 0.5x, 1x, 2x)
+  setPlaybackRate: (playbackRate: number) => void;
 }

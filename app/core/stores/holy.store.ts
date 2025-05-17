@@ -4,7 +4,7 @@ import { HolyStoreType } from "../types/stores.types";
 
 export const useHolyStore = create<HolyStoreType>((set) => ({
   currentListening: 0,
-  setCurrentListening: (index: number) => set({ currentListening: index }),
+  setCurrentListening: (currentListening: number) => set({ currentListening }),
 
   data: null,
   setData: (data: HolyDataType) => set({ data }),
@@ -13,24 +13,36 @@ export const useHolyStore = create<HolyStoreType>((set) => ({
   setMedia: (media: MediaType) => set({ media }),
 
   currentTime: 0,
-  setCurrentTime: (time: number) => set({ currentTime: time }),
+  setCurrentTime: (currentTime: number) => set({ currentTime }),
 
-  endAt: 0,
-  setEndAt: (time: number) => set({ endAt: time }),
+  isAudioPlaying: false,
+  setIsAudioPlaying: (isAudioPlaying: boolean) => set({ isAudioPlaying }),
 
-  isPlaying: false,
-  setIsPlaying: (bool: boolean) => set({ isPlaying: bool }),
+  isVideoPlaying: false,
+  setIsVideoPlaying: (isVideoPlaying: boolean) => set({ isVideoPlaying }),
 
   startFrom: 0,
-  setStartFrom: (time: number) => set({ startFrom: time }),
+  setStartFrom: (startFrom: number) => set({ startFrom }),
+
+  endAt: 0,
+  setEndAt: (endAt: number) => set({ endAt }),
 
   duration: 0,
-  setDuration: (time: number) => set({ duration: time }),
+  setDuration: (duration: number) => set({ duration }),
 
   isMuted: false,
-  setIsMuted: (bool: boolean) => set({ isMuted: bool }),
+  setIsMuted: (isMuted: boolean) => set({ isMuted }),
 
-  volumeLevel: 1,
-  setVolumeLevel: (label: number) => set({ volumeLevel: label }),
-  
+  volumeLevel: 1, // مقدار پیش‌فرض برای سطح صدا (0 تا 1)
+  setVolumeLevel: (volumeLevel: number) => set({ volumeLevel }),
+
+  isFullScreen: false,
+  setIsFullScreen: (isFullScreen: boolean) => set({ isFullScreen }),
+
+  videoQuality: "720p", // مقدار پیش‌فرض برای کیفیت ویدیو
+  setVideoQuality: (videoQuality: "240p" | "360p" | "480p" | "720p" | "1080p" | "1440p" | "4k") =>
+    set({ videoQuality }),
+
+  playbackRate: 1, // مقدار پیش‌فرض برای سرعت پخش (1x)
+  setPlaybackRate: (playbackRate: number) => set({ playbackRate }),
 }));
