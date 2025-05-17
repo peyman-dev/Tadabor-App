@@ -1,117 +1,127 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { PlayIcon, PauseIcon, FastForward } from 'lucide-react';
+import {
+  PlayIcon,
+  PauseIcon,
+  FastForward,
+  VolumeOff,
+  Volume1,
+  Volume2,
+} from 'lucide-react';
 import { useHolyStore } from '@/app/core/stores/holy.store';
 
-interface AudioProgressBarProps {
-  audioSrc: string;
-  primaryColor?: string;
-  backgroundColor?: string;
-  height?: number;
-}
-
-const AudioProgressBar: React.FC<AudioProgressBarProps> = ({
-  audioSrc,
+const AudioProgressBar = ({
   primaryColor = '#02BAD4',
   backgroundColor = '#E5E7EB',
   height = 12,
+  isDisabled = false,
 }) => {
-  const { setCurrentTime: setStoreCurrentTime, currentTime: initCurrentTime } = useHolyStore();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(initCurrentTime || 0); // مقدار اولیه به صورت ثانیه
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const {
+    isPlaying,
+    setIsPlaying,
+    setCurrentTime,
+    currentTime,
+    duration,
+    setIsMuted,
+    setVolumeLevel,
+    volumeLevel,
+  } = useHolyStore();
+
+  const progress = duration && !isNaN(duration) && !isNaN(currentTime) && currentTime >= 0 && duration > 0
+    ? Math.min(Math.max((currentTime / duration) * 100, 0), 100)
+    : 0;
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    if (!isPlaying) return;
 
-    const updateProgress = () => {
-      const currentTime = audio.currentTime;
-      const duration = audio.duration;
-      setCurrentTime(currentTime);
-      setStoreCurrentTime(currentTime);
-      setProgress(duration > 0 ? (currentTime / duration) * 100 : 0); // جلوگیری از تقسیم بر صفر
-    };
+    const interval = setInterval(() => {
+      if (isNaN(currentTime) || !isFinite(currentTime) || !duration || isNaN(duration) || duration <= 0) {
+        setCurrentTime(0);
+        return;
+      }
+      const newTime = Math.min(currentTime + 0.25, duration);
+      if (newTime >= duration) {
+        setIsPlaying(false);
+      }
+      setCurrentTime(newTime);
+    }, 250);
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-      audio.currentTime = initCurrentTime || 0; // تنظیم زمان اولیه بعد از لود شدن متادیتا
-      setProgress(audio.duration > 0 ? (initCurrentTime / audio.duration) * 100 : 0);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setProgress(0);
-      setCurrentTime(0);
-      setStoreCurrentTime(0);
-    };
-
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [initCurrentTime, setStoreCurrentTime]);
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
-    }
+    return () => clearInterval(interval);
+  }, [isPlaying, duration, currentTime, setCurrentTime, setIsPlaying]);
+  
+  const togglePlay = useCallback(() => {
     setIsPlaying(!isPlaying);
-  };
+  }, [isPlaying, setIsPlaying]);
 
-  const handleBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio || !audio.duration) return;
+  const handleVolumeToggle = useCallback(() => {
+    const nextLevel = (volumeLevel + 1) % 3;
+    setVolumeLevel(nextLevel);
+    setIsMuted(nextLevel === 0);
+  }, [volumeLevel, setVolumeLevel, setIsMuted]);
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const width = rect.width;
-    const newTime = (clickX / width) * audio.duration;
-    audio.currentTime = newTime;
+  const handleBarClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (isDisabled || !duration || isNaN(duration) || duration <= 0) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const wanting = e.clientX - rect.left;
+      const width = rect.width;
+      if (width <= 0) return;
+      const newTime = (wanting / width) * duration;
+      if (isNaN(newTime) || !isFinite(newTime)) return;
+      setCurrentTime(newTime);
+    },
+    [isDisabled, duration, setCurrentTime]
+  );
+
+  const skipForward = useCallback(() => {
+    if (isDisabled || !duration || isNaN(duration)) return;
+    const newTime = Math.min(currentTime + 10, duration);
+    if (isNaN(newTime) || !isFinite(newTime)) return;
     setCurrentTime(newTime);
-    setStoreCurrentTime(newTime);
-    setProgress((newTime / audio.duration) * 100);
-  };
+  }, [isDisabled, currentTime, duration, setCurrentTime]);
 
-  const formatTime = (seconds: number) => {
-    if (!seconds || isNaN(seconds)) return '0:00';
+  const skipBackward = useCallback(() => {
+    if (isDisabled) return;
+    const newTime = Math.max(currentTime - 10, 0);
+    if (isNaN(newTime) || !isFinite(newTime)) return;
+    setCurrentTime(newTime);
+  }, [isDisabled, currentTime, setCurrentTime]);
+
+  const formatTime = useCallback((seconds: number) => {
+    if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '0:00';
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+    const secs = Math.floor(seconds % 60)
+      .toString()
+      .padStart(2, '0');
+    return `${mins}:${secs}`;
+  }, []);
 
   return (
-    <div className="flex items-center justify-center gap-8 flex-col w-full">
+    <div className="flex flex-col items-center justify-center gap-8 w-full">
       <div className="flex flex-col gap-2 w-full max-w-md" dir="ltr">
-        <audio ref={audioRef} src={audioSrc} />
         <div className="flex items-center gap-3">
-          <div className="flex-1 relative cursor-pointer" onClick={handleBarClick} style={{ height }}>
-            <div className="w-full absolute top-0 rounded-full" style={{ backgroundColor, height }} />
-            <motion.div
-              className="absolute top-0 rounded-full !h-full bottom-0 my-auto"
-              style={{ backgroundColor: primaryColor }}
-              animate={{ width: `${progress}%` }}
-              transition={{ type: 'tween', ease: 'linear' }}
+          <div
+            className={`flex-1 relative ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={handleBarClick}
+            style={{ height }}
+          >
+            <div
+              className="w-full absolute top-0 rounded-full"
+              style={{ backgroundColor, height }}
             />
             <motion.div
-              className="absolute size-6 top-0 bottom-0 my-auto rounded-full bg-black"
-              animate={{ left: `${progress - 2}%` }}
+              className="absolute top-0 rounded-full h-full"
+              style={{ backgroundColor: primaryColor }}
+              animate={{ width: `${progress}%` }}
+              transition={{ type: 'tween', ease: 'linear', duration: 0.1 }}
+            />
+            <motion.div
+              className="absolute w-6 h-6 top-0 bottom-0 my-auto rounded-full"
               style={{ background: primaryColor }}
-              transition={{ type: 'tween', ease: 'linear' }}
+              animate={{ left: `${progress}%`, x: '-50%' }}
+              transition={{ type: 'tween', ease: 'linear', duration: 0.1 }}
             />
           </div>
         </div>
@@ -120,16 +130,43 @@ const AudioProgressBar: React.FC<AudioProgressBarProps> = ({
           <span>{formatTime(duration)}</span>
         </div>
       </div>
-      <div className="flex items-center  *:size-[45px] *:bg-gradient-to-t *:from-[#CDA84D] *:to-[#E6C472] text-white gap-5 md:gap-[25px] *:cursor-pointer *:rounded-full *:flex *:items-center *:justify-center *:md:size-[57px]">
-        <button>
-          <FastForward className="fill-white size-5 md:!size-7" />
+      <div className="relative max-w-max flex items-center justify-center">
+        <button
+          className={`absolute -right-18 w-8 h-8 bg-transparent z-10 text-[#CDA84D] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          onClick={handleVolumeToggle}
+          disabled={isDisabled}
+        >
+          {volumeLevel === 0 && <VolumeOff className="fill-white w-5 h-5 md:w-7 md:h-7" />}
+          {volumeLevel === 1 && <Volume1 className="fill-white w-5 h-5 md:w-7 md:h-7" />}
+          {volumeLevel === 2 && <Volume2 className="fill-white w-5 h-5 md:w-7 md:h-7" />}
         </button>
-        <button className="!size-[65px] md:!size-20" onClick={togglePlay}>
-          {isPlaying ? <PauseIcon /> : <PlayIcon />}
-        </button>
-        <button>
-          <FastForward className="fill-white rotate-180 size-5 md:!size-7" />
-        </button>
+        <div className="flex items-center justify-center w-full gap-5 md:gap-[25px]">
+          <button
+            className={`w-[45px] h-[45px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-[57px] md:h-[57px] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={skipBackward}
+            disabled={isDisabled}
+          >
+            <FastForward className="fill-white rotate-180 w-5 h-5 md:w-7 md:h-7" />
+          </button>
+          <button
+            className={`w-[65px] h-[65px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-20 md:h-20 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={togglePlay}
+            disabled={isDisabled}
+          >
+            {isPlaying ? (
+              <PauseIcon className="w-8 h-8 md:w-10 md:h-10" />
+            ) : (
+              <PlayIcon className="w-8 h-8 md:w-10 md:h-10" />
+            )}
+          </button>
+          <button
+            className={`w-[45px] h-[45px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-[57px] md:h-[57px] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={skipForward}
+            disabled={isDisabled}
+          >
+            <FastForward className="fill-white w-5 h-5 md:w-7 md:h-7" />
+          </button>
+        </div>
       </div>
     </div>
   );

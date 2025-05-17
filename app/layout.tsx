@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import { createSession } from "./actions";
+// import { createSession } from "./actions";
 import { ModalProvider } from "./components/common/modal";
 import AuthenticationProvider from "./core/providers/auth-provider";
+import { createSession } from "./actions";
 
 
 export const metadata: Metadata = {

@@ -12,9 +12,9 @@ import {
 // import { cookies as nextCookies } from "next/headers";
 
 export const createSession = async (): Promise<ApiResponseType> => {
-  const res = await sendRequest().get("/Login/CreateSession");
-  const data = await res.data;
-  return data;
+    const res = await sendRequest().get("/Login/CreateSession");
+    const data = await res.data;
+    return data;
 };
 
 export const login = async (
@@ -51,19 +51,33 @@ export const register = async (
   payload: RegisterType
 ): Promise<ApiResponseType> => {
   try {
-    const res = await sendRequest().post(
-      "/Login/Register",
-      JSON.stringify({
-        phone: "0" + payload.phone,
-        name: payload.name,
-        family: payload.family,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    console.log(payload);
+
+    // ایجاد یک پرومیس برای تایم اوت
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("درخواست بیش از 10 ثانیه طول کشید"));
+      }, 10000); // 10 ثانیه
+    });
+
+    // اجرای درخواست و تایم اوت به صورت موازی
+    const res = await Promise.race([
+      sendRequest().post(
+        "/Login/Register",
+        JSON.stringify({
+          phone: "0" + payload.phone,
+          name: payload.name,
+          family: payload.family,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ),
+      timeoutPromise
+    ]);
+
     const data = await res.data;
     return data;
   } catch (error: any) {
@@ -72,26 +86,35 @@ export const register = async (
   }
 };
 
+
 export const verifyOTP = async (
   payload: OTPValidationType
 ): Promise<ApiResponseType> => {
   try {
     await createSession();
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/Login/LoginPhoneAcept`,
-      {
-        method: "POST",
+    // ایجاد یک پرومیس برای تایم اوت
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("درخواست بیش از 10 ثانیه طول کشید"));
+      }, 10000); // 10 ثانیه
+    });
+
+    // اجرای درخواست و تایم اوت به صورت موازی
+    const res = await Promise.race([
+      sendRequest().post("/Login/LoginPhoneAcept", {}, {
         headers: {
           Phone: payload.Phone,
-          Code: payload.Code,
+          Code: payload.Code
         },
-      }
-    );
+        withCredentials: true,
+      }),
+      timeoutPromise
+    ]);
 
-    const data: ApiResponseType = await res.json();
+    const data: ApiResponseType = res.data;
 
-    // Save the data to localStorage
+    // ذخیره داده‌ها در localStorage
     if (data.erroCode == 200) {
       localStorage.setItem("userData", JSON.stringify(data.data));
     } else {
@@ -111,11 +134,13 @@ export const getDailyData = async () => {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=9329523958`,
+      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=92359233958`,
       {
         method: "GET",
       }
     );
+
+    
     const data = await res.json();
     return data;
   } catch (error: any) {

@@ -21,4 +21,13 @@ export interface HolyStoreType {
 
   endAt: number,
   setEndAt: (endAt: number) => void;
+
+  duration: number,
+  setDuration: (duration: number) => void;
+
+  isMuted: boolean;
+  setIsMuted: (bool: boolean) => void;
+
+  volumeLevel: number,
+  setVolumeLevel: (volumeLevel: number) => void;
 }

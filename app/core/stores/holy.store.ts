@@ -22,5 +22,15 @@ export const useHolyStore = create<HolyStoreType>((set) => ({
   setIsPlaying: (bool: boolean) => set({ isPlaying: bool }),
 
   startFrom: 0,
-  setStartFrom:   (time: number) => set({ startFrom: time }),
+  setStartFrom: (time: number) => set({ startFrom: time }),
+
+  duration: 0,
+  setDuration: (time: number) => set({ duration: time }),
+
+  isMuted: false,
+  setIsMuted: (bool: boolean) => set({ isMuted: bool }),
+
+  volumeLevel: 1,
+  setVolumeLevel: (label: number) => set({ volumeLevel: label }),
+  
 }));

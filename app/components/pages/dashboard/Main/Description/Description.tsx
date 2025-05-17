@@ -8,7 +8,6 @@ const Description = () => {
   const { data } = useHolyStore()
   const dataDesc = data?.informationSentences[3].value
 
-  console.log(data?.informationSentences[3])
 
 
   return (
