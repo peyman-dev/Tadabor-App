@@ -1,4 +1,4 @@
-// "use server";
+"use client";
 import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
 import {
@@ -9,6 +9,8 @@ import {
   OTPValidationType,
   RegisterType,
 } from "./core/types/types";
+
+import {v4 as uniqueID} from 'uuid'
 
 export const createSession = async (): Promise<ApiResponseType> => {
   console.log("Sending GET request to /Login/CreateSession", {
@@ -168,41 +170,39 @@ export const getDailyData = async (): Promise<DailyDataResponseType> => {
   await createSession();
 
   try {
-    // دریافت آدرس IP کاربر (مثال: از یک API یا متغیر محیطی)
-    const userIP = await fetchUserIP(); // این تابع باید پیاده‌سازی شود
+    // const userIP = await fetchUserIP(); 
 
     console.log("Sending GET request to /CallOfTheDay/GetDaily", {
       method: "GET",
-      endpoint: `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${userIP}`,
+      endpoint: `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${uniqueID}`,
       headers: {},
       body: null,
     });
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${userIP}`,
+      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${uniqueID}`,
       {
         method: "GET",
       }
     );
     
     const data = await res.json();
-    console.log(data);
     return data;
   } catch (error: any) {
     return error;
   }
 };
 
-const fetchUserIP = async (): Promise<string> => {
-  try {
-    const res = await fetch("https://api.ipify.org?format=json");
-    const data = await res.json();
-    return data.ip;
-  } catch (error) {
-    console.error("Error fetching user IP:", error);
-    return "unknown";
-  }
-};
+// const fetchUserIP = async (): Promise<string> => {
+//   try {
+//     const res = await fetch("https://api.ipify.org?format=json");
+//     const data = await res.json();
+//     return data.ip;
+//   } catch (error) {
+//     console.error("Error fetching user IP:", error);
+//     return "unknown";
+//   }
+// };
 
 export const getMedia = async (mediaId: string) => {
   console.log("Sending GET request to /api/v1/Media/Get", {
@@ -225,7 +225,7 @@ export const getMedia = async (mediaId: string) => {
 
 export const generateMediaSrc = (mediaId: string) => {
   console.log("Generating media download URL", {
-    endpoint: `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/Files/DownloadFile?IDMedia=${mediaId}`,
+    endpoint: `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`,
     apiType: "FILES",
   });
 

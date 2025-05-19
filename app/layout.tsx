@@ -3,7 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { ModalProvider } from "./components/common/modal";
 import AuthenticationProvider from "./core/providers/auth-provider";
-import { createSession, getDailyData } from "./actions";
+import { createSession } from "./actions";
 
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await getDailyData()
+  // await getDailyData()
   await createSession();
 
   return (
