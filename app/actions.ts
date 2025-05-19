@@ -1,4 +1,3 @@
-"use client";
 import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
 import {
