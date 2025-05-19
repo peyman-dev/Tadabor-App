@@ -6,7 +6,7 @@ import { useHolyStore } from '@/app/core/stores/holy.store';
 import AudioPlayer from './Audio/AudioPlayer';
 import { generateMediaSrc } from '@/app/actions';
 const MediaSection = () => {
-    const { media, data } = useHolyStore()
+    const { data } = useHolyStore()
 
 
 

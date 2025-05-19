@@ -16,4 +16,5 @@ const getBaseUrl = (type: API_METHOD = "USER") => {
 export const sendRequest = (type: API_METHOD = "USER") =>
   axios.create({
     baseURL: getBaseUrl(type),
+    withCredentials: true,
   });

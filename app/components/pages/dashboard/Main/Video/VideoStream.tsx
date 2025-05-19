@@ -18,20 +18,19 @@ const VideoStream = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rotation, setRotation] = useState<number>(0); // حالت برای چرخش ویدیو
+  const [rotation, setRotation] = useState<number>(0); 
 
-  const generateVideoSrc = async () => {
-    // const res = await getMedia("160017")
-    // return res.id
-  };
 
+  console.log(media)
+  
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    console.log("TESt");
-    const src = generateMediaSrc("160017");
+    const src = generateMediaSrc(String(media?.id));
 
+    console.log(src)
+    
     video.src = src;
 
     const handleLoadedMetadata = () => {
@@ -104,8 +103,8 @@ const VideoStream = () => {
   };
 
   return (
-    <div className="w-full relative h-[267.44px] md:h-[496px] p-5 overflow-hidden bg-[#9FE1EF] rounded-[16px]">
-      <div className="size-full overflow-hidden rounded-[16px] flex items-center justify-center relative">
+    <div className="w-full relative h-[267.44px] md:h-[496px] p-3 overflow-hidden bg-[#9FE1EF] rounded-[56px]">
+      <div className="size-full overflow-hidden rounded-[56px] flex items-center justify-center relative">
         {!isVideoPlaying ? (
           <div
             onClick={() => setIsVideoPlaying(!isVideoPlaying)}
