@@ -1,95 +1,69 @@
-'use client';
+'use client'
 
-import { useHolyStore } from '@/app/core/stores/holy.store';
-import classNames from 'classnames';
-import React, { useCallback, useEffect, useState } from 'react';
-
-// Define interfaces for type safety
-interface Word {
-  index: number;
-  value: string;
-}
-
-interface AudioWord {
-  idword: number;
-  startPage: number;
-  endPage: number;
-}
+import useTestData from '@/app/core/hooks/useTestData'
+import { useHolyStore } from '@/app/core/stores/holy.store'
+import classNames from 'classnames'
+import React, { useCallback, useEffect, useState } from 'react'
 
 const VerseContent = () => {
-  const {
-    data,
-    setIsAudioPlaying,
-    isAudioPlaying,
-    currentTime,
-    seekToTime,
-    isAudioLoaded,
-  } = useHolyStore();
-  const sentence = data?.sentence;
-  const wordsTimelines = data?.audioSentenceDTO?.[0];
-  const wordsAudioArray: AudioWord[] | undefined = wordsTimelines?.audioWords;
+  const { data,setIsAudioPlaying, isAudioPlaying, currentTime, seekToTime, isAudioLoaded } = useHolyStore()
+  const sentence = data?.sentence
+  const wordsTimelines = data?.audioSentenceDTO?.[0]
+  const wordsAudioArray = wordsTimelines?.audioWords
+  const [activeWordIndex, setActiveWordIndex] = useState(0)
 
-  // State for tracking the active word index
-  const [activeWordIndex, setActiveWordIndex] = useState<number>(0);
-
-  // Update active word based on currentTime
   useEffect(() => {
     if (!wordsAudioArray || !isAudioPlaying) {
-      setActiveWordIndex(0);
-      return;
+      setActiveWordIndex(0)
+      return
     }
 
-    const currentTimeMs = currentTime * 1000;
+    const currentTimeMs = currentTime * 1000
+    const activeWord = wordsAudioArray.find((word: any) => {
+      return currentTimeMs >= word.startPage && currentTimeMs < word.endPage
+    })
 
-    const activeWord = wordsAudioArray.find((word) => {
-      return currentTimeMs >= word.startPage && currentTimeMs < word.endPage;
-    });
-
-    // Only update activeWordIndex if a valid word is found and it's different from the current index
     if (activeWord && activeWord.idword !== activeWordIndex) {
-      setActiveWordIndex(activeWord.idword);
+      setActiveWordIndex(activeWord.idword)
     } else if (!activeWord && activeWordIndex !== 0) {
-      setActiveWordIndex(0);
+      setActiveWordIndex(0)
     }
-  }, [currentTime, wordsAudioArray, isAudioPlaying, activeWordIndex]);
+  }, [currentTime, wordsAudioArray, isAudioPlaying, activeWordIndex])
 
   const RenderSentence = () => {
     const handleActiveWord = useCallback(
-      (e: React.MouseEvent<HTMLSpanElement>) => {
+      (e: any) => {
         if (!wordsAudioArray || !isAudioLoaded) {
-          return;
+          return
         }
 
-        const clickedIndex = parseInt(e.currentTarget.dataset.wordid || '0', 10);
-        const clickedWord = wordsAudioArray.find((word: AudioWord) => word.idword === clickedIndex);
+        const clickedIndex = parseInt(e.currentTarget.dataset.wordid || '0', 10)
+        const clickedWord = wordsAudioArray.find((word: any) => word.idword === clickedIndex)
 
         if (clickedWord) {
-          const newTime = clickedWord.startPage / 1000;
-          seekToTime(newTime);
-          setActiveWordIndex(clickedIndex);
+          const newTime = clickedWord.startPage / 1000
+          seekToTime(newTime)
+          setActiveWordIndex(clickedIndex)
           if (!isAudioPlaying) {
-            setIsAudioPlaying(true);
+            setIsAudioPlaying(true)
           }
         }
       },
       [wordsAudioArray, isAudioPlaying, seekToTime, setIsAudioPlaying, isAudioLoaded]
-    );
+    )
 
     switch (sentence?.wordByWord) {
-      case true: {
+      case true:
         return (
           <div>
-            {sentence.words.map((word: Word) => (
+            {sentence.words.map((word: any) => (
               <span
                 key={word.index}
                 data-wordid={word.index}
-                className={classNames(
-                  'inline-block select-none px-0.5 cursor-pointer',
-                  { 
-                    '!text-[#FBF00A]': activeWordIndex === word.index,
-                    'text-gray-600': activeWordIndex !== word.index,
-                  }
-                )}
+                className={classNames('inline-block select-none px-0.5 cursor-pointer', {
+                  '!text-[#FBF00A]': activeWordIndex === word.index,
+                  'text-gray-600': activeWordIndex !== word.index,
+                })}
                 onClick={handleActiveWord}
               >
                 {word.value}
@@ -99,16 +73,18 @@ const VerseContent = () => {
               <p className="text-xs opacity-80 mt-1">{sentence.translateDocumnt}</p>
             </div>
           </div>
-        );
-      }
-      case false: {
-        return <div>not word by word</div>;
-      }
-      default: {
-        return null;
-      }
+        )
+      case false:
+        return (
+          <div>
+            <p>{sentence?.document}</p>
+            <p className="text-xs opacity-80 mt-1">{sentence.translateDocumnt}</p>
+          </div>
+        )
+      default:
+        return null
     }
-  };
+  }
 
   return (
     <section className="size-full !pt-[51px] *:max-w-[260px] pb-[51px] !mx-auto min-h-[265px] rounded-[13px] bg-gradient-to-t border border-[#4C8BEA]/50 from-[#02BAD4] to-[#A4E3F0] !flex !items-center !justify-center text-center">
@@ -116,7 +92,7 @@ const VerseContent = () => {
         <RenderSentence />
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default VerseContent;
+export default VerseContent

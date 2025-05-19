@@ -17,7 +17,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // await getDailyData()
+  await getDailyData()
   await createSession();
 
   return (

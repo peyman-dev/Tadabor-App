@@ -87,7 +87,7 @@ export interface HolyDataType {
   translate: null;
 }
 
-interface InformationSentence {
+export interface InformationSentence {
   id: number;
   idinformation: number;
   idsentence: number;

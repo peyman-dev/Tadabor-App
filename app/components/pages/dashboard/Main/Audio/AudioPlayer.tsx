@@ -57,7 +57,6 @@ const AudioPlayer = ({
     const audio = audioRef.current;
     if (!audio || !src) return;
 
-    console.log('Setting audio src:', src);
     if (audio.src !== src) {
       audio.src = src;
       audio.load();
@@ -65,7 +64,6 @@ const AudioPlayer = ({
     }
 
     const handleCanPlay = () => {
-      console.log('Audio can play, duration:', audio.duration);
       setIsAudioLoaded(true); // Mark audio as ready to play
       if (!isNaN(audio.duration) && isFinite(audio.duration)) {
         setDuration(audio.duration);
@@ -86,7 +84,6 @@ const AudioPlayer = ({
     };
 
     const handleError = () => {
-      console.error('Error loading audio');
       setIsAudioPlaying(false);
       setDuration(0);
       setIsAudioLoaded(false);
@@ -97,7 +94,6 @@ const AudioPlayer = ({
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
-    // Only call load if not already loading
     if (!audio.src || audio.src !== src) {
       audio.load();
     }

@@ -1,21 +1,21 @@
 import React, { ReactNode } from 'react'
 import Header from '../components/pages/dashboard/Header/Header'
 import DashboardProvider from '../core/providers/dashboard-provider'
-// import { HolyResponse, MediaType } from '../core/types/types'
-// import useTestData from '../core/hooks/useTestData'
+import { HolyResponse, MediaType } from '../core/types/types'
+import useTestData from '../core/hooks/useTestData'
 import { getDailyData, getMedia } from '../actions'
 // import { getDailyData } from '../actions'
 
 const layout = async ({ children }: { children: ReactNode }) => {
 
     //? This is the test data (Back-End had some bugs and My Request was not working)
-    //! const Response: HolyResponse = useTestData()
-    
+    const Response: HolyResponse = useTestData()
+
     // const foundedMediaEntry = Response?.data?.informationSentences?.find((item) => item?.information?.value == "Media")
     // const media = await getMedia(String(foundedMediaEntry?.value))
 
     //* Fetch Daily Data from Server
-    const Response = await getDailyData()
+    // const Response = await getDailyData()
 
 
 

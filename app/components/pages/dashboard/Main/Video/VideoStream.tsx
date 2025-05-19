@@ -1,8 +1,8 @@
 'use client';
 
-import { mediaStreamUrl } from '@/app/actions';
+import { getMedia, mediaStreamUrl } from '@/app/actions';
 import { useHolyStore } from '@/app/core/stores/holy.store';
-import { PauseIcon, PlayIcon } from 'lucide-react';
+import { PauseIcon, PlayIcon, RotateCw, Maximize } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 const VideoStream = () => {
@@ -18,16 +18,21 @@ const VideoStream = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [rotation, setRotation] = useState<number>(0); // حالت برای چرخش ویدیو
+
+  const generateVideoSrc = async () => {
+    // const res = await getMedia("160017")
+    // return res.id
+  };
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !media?.id) return;
+    if (!video) return;
 
-    const src = mediaStreamUrl(String(media.id));
-    if (video.src !== src) {
-      video.src = src;
-      video.load();
-    }
+    console.log("TESt");
+    const src = mediaStreamUrl("160017");
+
+    video.src = src;
 
     const handleLoadedMetadata = () => {
       setError(null);
@@ -57,14 +62,13 @@ const VideoStream = () => {
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', handleError);
     };
-  }, [media?.id, setIsVideoPlaying, isVideoPlaying]);
+  }, ["1600175", setIsVideoPlaying, isVideoPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (isVideoPlaying) {
-      // وقتی ویدیو پخش می‌شود، صوت را متوقف کنید
       setIsAudioPlaying(false);
       video.play().catch(() => {
         setIsVideoPlaying(false);
@@ -95,9 +99,13 @@ const VideoStream = () => {
     }
   };
 
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360); 
+  };
+
   return (
-    <div className="w-full h-[267.44px] md:h-[496px] p-5 overflow-hidden bg-[#9FE1EF] rounded-[50px]">
-      <div className="size-full overflow-hidden rounded-[50px] flex items-center justify-center relative">
+    <div className="w-full relative h-[267.44px] md:h-[496px] p-5 overflow-hidden bg-[#9FE1EF] rounded-[16px]">
+      <div className="size-full overflow-hidden rounded-[16px] flex items-center justify-center relative">
         {!isVideoPlaying ? (
           <div
             onClick={() => setIsVideoPlaying(!isVideoPlaying)}
@@ -115,25 +123,30 @@ const VideoStream = () => {
           </div>
         ) : null}
 
-        {media?.id ? (
-          error ? (
-            <div className="size-full flex items-center justify-center text-red-500">
-              <p>{error}</p>
-            </div>
-          ) : (
-            <video
-              ref={videoRef}
-              className="!size-full object-VideoStream"
-              onClick={() => setIsVideoPlaying(!isVideoPlaying)}
-              preload="metadata"
-              onDoubleClick={toggleFullScreen}
-            />
-          )
-        ) : (
-          <div className="size-full flex items-center justify-center">
-            <p>ویدیو قابل پخش نمی‌باشد!</p>
-          </div>
-        )}
+        <video
+          ref={videoRef}
+          className="!size-full object-VideoStream"
+          style={{ transform: `rotate(${rotation}deg)` }} // اعمال چرخش
+          onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+          preload="metadata"
+          onDoubleClick={toggleFullScreen}
+        />
+
+        {/* دکمه چرخش */}
+        <button
+          onClick={handleRotate}
+          className={`w-[32px] h-[32px] bottom-6 right-6 bg-gradient-to-t absolute from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-8 md:h-8 cursor-pointer z-1000`}
+        >
+          <RotateCw className="size-5" />
+        </button>
+
+        {/* دکمه تمام‌صفحه */}
+        <button
+          onClick={toggleFullScreen}
+          className={`w-[32px] h-[32px] bottom-6 right-16 bg-gradient-to-t absolute from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-8 md:h-8 cursor-pointer z-1000`}
+        >
+          <Maximize className="size-5" />
+        </button>
       </div>
     </div>
   );

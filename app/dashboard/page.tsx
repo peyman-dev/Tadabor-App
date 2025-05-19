@@ -7,11 +7,13 @@ import Description from '../components/pages/dashboard/Main/Description/Descript
 const DashboardPage = () => {
 
   return (
-      <Container>
-        <MediaSection />
+    <Container>
+      <MediaSection />
+      <div className='md:w-1/2 space-y-[42px] w-full'>
         <VerseSection />
         <Description />
-      </Container>
+      </div>
+    </Container >
   )
 }
 
