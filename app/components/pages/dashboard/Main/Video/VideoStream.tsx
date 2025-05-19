@@ -1,6 +1,6 @@
 'use client';
 
-import { getMedia, mediaStreamUrl } from '@/app/actions';
+import { getMedia, generateMediaSrc } from '@/app/actions';
 import { useHolyStore } from '@/app/core/stores/holy.store';
 import { PauseIcon, PlayIcon, RotateCw, Maximize } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -30,7 +30,7 @@ const VideoStream = () => {
     if (!video) return;
 
     console.log("TESt");
-    const src = mediaStreamUrl("160017");
+    const src = generateMediaSrc("160017");
 
     video.src = src;
 

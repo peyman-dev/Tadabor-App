@@ -60,7 +60,7 @@ const AudioPlayer = ({
     if (audio.src !== src) {
       audio.src = src;
       audio.load();
-      setIsAudioLoaded(false); // Reset loaded state when src changes
+      setIsAudioLoaded(false); 
     }
 
     const handleCanPlay = () => {
@@ -147,7 +147,7 @@ const AudioPlayer = ({
   }, [playbackRate]);
 
   const togglePlay = useCallback(() => {
-    if (!isAudioLoaded) return; // Prevent play toggle if audio is not loaded
+    if (!isAudioLoaded) return; 
     setIsAudioPlaying(!isAudioPlaying);
   }, [isAudioPlaying, setIsAudioPlaying, isAudioLoaded]);
 

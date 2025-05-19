@@ -157,7 +157,7 @@ export const getMedia = async (mediaId: string) => {
   return data?.data as MediaType;
 };
 
-export const mediaStreamUrl =  (mediaId: string) => {
+export const generateMediaSrc =  (mediaId: string) => {
   // const res = await sendRequest("FILES").get(
   //   `/api/File/DownloadFile?IDMedia=${mediaId}`
   // );
