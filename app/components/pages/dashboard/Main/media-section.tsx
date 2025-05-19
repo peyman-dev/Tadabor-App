@@ -7,6 +7,7 @@ import AudioPlayer from './Audio/AudioPlayer';
 const MediaSection = () => {
     const { media } = useHolyStore()
 
+
     return (
         <>
             <VideoStream />

@@ -177,3 +177,13 @@ export interface MediaType {
   pathMain: string | null;
   duration: number;
 }
+
+
+export interface DailyDataResponseType {
+  erroCode: number;
+  systemMessage: string;
+  message: string | null;
+  data: {
+    body: string; // این فیلد حاوی یک JSON رشته‌ای شده است که باید جداگانه Parse شود
+  };
+}

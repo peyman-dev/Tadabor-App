@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { sendRequest } from "./core/api/axios";
 import {
   ApiResponseType,
+  DailyDataResponseType,
   LoginPayloadType,
   MediaType,
   OTPValidationType,
@@ -14,6 +15,7 @@ import {
 export const createSession = async (): Promise<ApiResponseType> => {
     const res = await sendRequest().get("/Login/CreateSession");
     const data = await res.data;
+    console.log("Sesson Created")
     return data;
 };
 
@@ -129,12 +131,12 @@ export const verifyOTP = async (
   }
 };
 
-export const getDailyData = async () => {
+export const getDailyData = async (): Promise<DailyDataResponseType> => {
   await createSession();
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=92359233958`,
+      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=949233958`,
       {
         method: "GET",
       }
@@ -142,6 +144,7 @@ export const getDailyData = async () => {
 
     
     const data = await res.json();
+    console.log(data)
     return data;
   } catch (error: any) {
     return error;
@@ -158,6 +161,7 @@ export const getMedia = async (mediaId: string) => {
   const data = await res.data;
   return data?.data as MediaType;
 };
+
 
 export const mediaStreamUrl = (mediaId: string) => {
   return `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?IDMedia=${mediaId}`;

@@ -17,7 +17,14 @@ interface AudioWord {
 }
 
 const VerseContent = () => {
-  const { data, setIsAudioPlaying, isAudioPlaying, currentTime, setCurrentTime } = useHolyStore();
+  const {
+    data,
+    setIsAudioPlaying,
+    isAudioPlaying,
+    currentTime,
+    seekToTime,
+    isAudioLoaded,
+  } = useHolyStore();
   const sentence = data?.sentence;
   const wordsTimelines = data?.audioSentenceDTO?.[0];
   const wordsAudioArray: AudioWord[] | undefined = wordsTimelines?.audioWords;
@@ -25,11 +32,12 @@ const VerseContent = () => {
   // State for tracking the active word index
   const [activeWordIndex, setActiveWordIndex] = useState<number>(0);
 
-  console.log(data);
-
   // Update active word based on currentTime
   useEffect(() => {
-    if (!wordsAudioArray || !isAudioPlaying) return;
+    if (!wordsAudioArray || !isAudioPlaying) {
+      setActiveWordIndex(0);
+      return;
+    }
 
     const currentTimeMs = currentTime * 1000;
 
@@ -37,23 +45,34 @@ const VerseContent = () => {
       return currentTimeMs >= word.startPage && currentTimeMs < word.endPage;
     });
 
-    setActiveWordIndex(activeWord ? activeWord.idword : 0);
-  }, [currentTime, wordsAudioArray, isAudioPlaying]);
+    // Only update activeWordIndex if a valid word is found and it's different from the current index
+    if (activeWord && activeWord.idword !== activeWordIndex) {
+      setActiveWordIndex(activeWord.idword);
+    } else if (!activeWord && activeWordIndex !== 0) {
+      setActiveWordIndex(0);
+    }
+  }, [currentTime, wordsAudioArray, isAudioPlaying, activeWordIndex]);
 
   const RenderSentence = () => {
     const handleActiveWord = useCallback(
       (e: React.MouseEvent<HTMLSpanElement>) => {
-        const clickedIndex = parseInt(e.currentTarget.dataset.wordid || '0', 10);
-        if (!wordsAudioArray) return;
+        if (!wordsAudioArray || !isAudioLoaded) {
+          return;
+        }
 
+        const clickedIndex = parseInt(e.currentTarget.dataset.wordid || '0', 10);
         const clickedWord = wordsAudioArray.find((word: AudioWord) => word.idword === clickedIndex);
+
         if (clickedWord) {
-          setCurrentTime(clickedWord.startPage / 1000);
-          setActiveWordIndex(clickedIndex); // Update active word
-          if (!isAudioPlaying) setIsAudioPlaying(true); // Start playing audio if not already
+          const newTime = clickedWord.startPage / 1000;
+          seekToTime(newTime);
+          setActiveWordIndex(clickedIndex);
+          if (!isAudioPlaying) {
+            setIsAudioPlaying(true);
+          }
         }
       },
-      [wordsAudioArray, isAudioPlaying, setCurrentTime, setIsAudioPlaying]
+      [wordsAudioArray, isAudioPlaying, seekToTime, setIsAudioPlaying, isAudioLoaded]
     );
 
     switch (sentence?.wordByWord) {
@@ -66,9 +85,9 @@ const VerseContent = () => {
                 data-wordid={word.index}
                 className={classNames(
                   'inline-block select-none px-0.5 cursor-pointer',
-                  {
-                    '!text-[#FBF00A]': activeWordIndex >= word.index && activeWordIndex !== 0,
-                    'text-gray-600': activeWordIndex < word.index || activeWordIndex === 0,
+                  { 
+                    '!text-[#FBF00A]': activeWordIndex === word.index,
+                    'text-gray-600': activeWordIndex !== word.index,
                   }
                 )}
                 onClick={handleActiveWord}

@@ -40,6 +40,10 @@ const AudioPlayer = ({
     volumeLevel,
     playbackRate,
     setPlaybackRate,
+    isSeeking,
+    setIsSeeking,
+    isAudioLoaded,
+    setIsAudioLoaded,
   } = useHolyStore();
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -56,21 +60,24 @@ const AudioPlayer = ({
     console.log('Setting audio src:', src);
     if (audio.src !== src) {
       audio.src = src;
-      audio.load(); // Force load when src changes
+      audio.load();
+      setIsAudioLoaded(false); // Reset loaded state when src changes
     }
 
-    const handleLoadedMetadata = () => {
-      const newDuration = audio.duration;
-      console.log('Loaded metadata, duration:', newDuration);
-      if (!isNaN(newDuration) && isFinite(newDuration)) {
-        setDuration(newDuration);
+    const handleCanPlay = () => {
+      console.log('Audio can play, duration:', audio.duration);
+      setIsAudioLoaded(true); // Mark audio as ready to play
+      if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+        setDuration(audio.duration);
       } else {
         setDuration(0);
       }
     };
 
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
+      if (!isSeeking) {
+        setCurrentTime(audio.currentTime);
+      }
     };
 
     const handleEnded = () => {
@@ -82,26 +89,40 @@ const AudioPlayer = ({
       console.error('Error loading audio');
       setIsAudioPlaying(false);
       setDuration(0);
+      setIsAudioLoaded(false);
     };
 
-    // Initial load attempt
-    audio.load();
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
+    // Only call load if not already loading
+    if (!audio.src || audio.src !== src) {
+      audio.load();
+    }
+
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [src, setCurrentTime, setDuration, setIsAudioPlaying]);
+  }, [src, setCurrentTime, setDuration, setIsAudioPlaying, setIsAudioLoaded, isSeeking]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    if (isSeeking && !isNaN(currentTime) && isFinite(currentTime)) {
+      audio.currentTime = currentTime;
+      setIsSeeking(false);
+    }
+  }, [currentTime, isSeeking, setIsSeeking]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !isAudioLoaded) return;
 
     if (isAudioPlaying) {
       setIsVideoPlaying(false);
@@ -112,7 +133,7 @@ const AudioPlayer = ({
     } else {
       audio.pause();
     }
-  }, [isAudioPlaying, setIsVideoPlaying, setIsAudioPlaying]);
+  }, [isAudioPlaying, setIsVideoPlaying, setIsAudioPlaying, isAudioLoaded]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -130,8 +151,9 @@ const AudioPlayer = ({
   }, [playbackRate]);
 
   const togglePlay = useCallback(() => {
+    if (!isAudioLoaded) return; // Prevent play toggle if audio is not loaded
     setIsAudioPlaying(!isAudioPlaying);
-  }, [isAudioPlaying, setIsAudioPlaying]);
+  }, [isAudioPlaying, setIsAudioPlaying, isAudioLoaded]);
 
   const handleVolumeToggle = useCallback(() => {
     const nextLevel = (volumeLevel + 1) % 3;
@@ -141,7 +163,7 @@ const AudioPlayer = ({
 
   const handleBarClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (isDisabled || !duration || isNaN(duration) || duration <= 0) return;
+      if (isDisabled || !duration || isNaN(duration) || duration <= 0 || !isAudioLoaded) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const wanting = e.clientX - rect.left;
       const width = rect.width;
@@ -153,28 +175,28 @@ const AudioPlayer = ({
         audioRef.current.currentTime = newTime;
       }
     },
-    [isDisabled, duration, setCurrentTime]
+    [isDisabled, duration, setCurrentTime, isAudioLoaded]
   );
 
   const skipForward = useCallback(() => {
-    if (isDisabled || !duration || isNaN(duration)) return;
+    if (isDisabled || !duration || isNaN(duration) || !isAudioLoaded) return;
     const newTime = Math.min(currentTime + 10, duration);
     if (isNaN(newTime) || !isFinite(newTime)) return;
     setCurrentTime(newTime);
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
     }
-  }, [isDisabled, currentTime, duration, setCurrentTime]);
+  }, [isDisabled, currentTime, duration, setCurrentTime, isAudioLoaded]);
 
   const skipBackward = useCallback(() => {
-    if (isDisabled) return;
+    if (isDisabled || !isAudioLoaded) return;
     const newTime = Math.max(currentTime - 10, 0);
     if (isNaN(newTime) || !isFinite(newTime)) return;
     setCurrentTime(newTime);
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
     }
-  }, [isDisabled, currentTime, setCurrentTime]);
+  }, [isDisabled, currentTime, setCurrentTime, isAudioLoaded]);
 
   const formatTime = useCallback((seconds: number) => {
     if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '0:00';
@@ -185,7 +207,7 @@ const AudioPlayer = ({
 
   return (
     <div className="flex flex-col items-center justify-center gap-[42px] mt-[42px] w-full">
-      <audio ref={audioRef} preload="metadata" style={{ display: 'none' }} />
+      <audio ref={audioRef} preload="auto" style={{ display: 'none' }} />
 
       <div className="flex flex-col gap-2 w-full max-w-md" dir="ltr">
         <div
@@ -218,7 +240,9 @@ const AudioPlayer = ({
 
       <div className="relative max-w-max flex items-center justify-center">
         <button
-          className={`absolute -right-18 w-8 h-8 bg-transparent z-10 text-[#CDA84D] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          className={`absolute -right-18 w-8 h-8 bg-transparent z-10 text-[#CDA84D] ${
+            isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+          }`}
           onClick={handleVolumeToggle}
           disabled={isDisabled}
         >
@@ -228,14 +252,18 @@ const AudioPlayer = ({
         </button>
         <div className="flex items-center justify-center w-full gap-5 md:gap-[25px]">
           <button
-            className={`w-[45px] h-[45px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-[57px] md:h-[57px] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`w-[45px] h-[45px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-[57px] md:h-[57px] ${
+              isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            }`}
             onClick={skipForward}
             disabled={isDisabled}
           >
             <FastForward className="fill-white w-5 h-5 md:w-7 md:h-7" />
           </button>
           <button
-            className={`w-[65px] h-[65px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-20 md:h-20 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`w-[65px] h-[65px] bg-gradient-to-t from-[#CDA84D] to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-20 md:h-20 ${
+              isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            }`}
             onClick={togglePlay}
             disabled={isDisabled}
           >
@@ -246,7 +274,9 @@ const AudioPlayer = ({
             )}
           </button>
           <button
-            className={`w-[45px] h-[45px] bg-gradient-to-t from-[#CDA84D] rotate-180 to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-[57px] md:h-[57px] ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`w-[45px] h-[45px] bg-gradient-to-t from-[#CDA84D] rotate-180 to-[#E6C472] text-white rounded-full flex items-center justify-center md:w-[57px] md:h-[57px] ${
+              isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            }`}
             onClick={skipBackward}
             disabled={isDisabled}
           >

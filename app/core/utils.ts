@@ -31,4 +31,8 @@ export const volume = {
     volume: 1,
     active: true,
   },
-} as const
+} as const;
+
+export const ParseThis = (data: any) => {
+  return JSON.parse(JSON.stringify(data));
+};
