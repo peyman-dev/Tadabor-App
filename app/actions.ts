@@ -9,32 +9,44 @@ import {
   RegisterType,
 } from "./core/types/types";
 
-import {v4 as uniqueID} from 'uuid'
+import { v4 as uniqueID } from "uuid";
 
 export const createSession = async (): Promise<ApiResponseType> => {
-  console.log("Sending GET request to /Login/CreateSession", {
-    method: "GET",
-    endpoint: "/Login/CreateSession",
-    headers: {},
-    body: null,
-  });
+  console.log(
+    "%cSending GET request to /Login/CreateSession",
+    "color: red; background: black",
+    {
+      method: "GET",
+      endpoint: "/Login/CreateSession",
+      headers: {},
+      body: null,
+    }
+  );
 
   const res = await sendRequest().get("/Login/CreateSession");
   const data = await res.data;
 
-
+  console.log(
+    "%cResponse from /Login/CreateSession",
+    "color: green; background: black",
+    data
+  );
   return data;
 };
 
 export const login = async (
   payload: LoginPayloadType
 ): Promise<ApiResponseType> => {
-  console.log("Sending POST request to /Login/LoginPhone", {
-    method: "POST",
-    endpoint: "/Login/LoginPhone",
-    headers: { Phone: payload.Phone.toString() },
-    body: null,
-  });
+  console.log(
+    "%cSending POST request to /Login/LoginPhone",
+    "color: red; background: black",
+    {
+      method: "POST",
+      endpoint: "/Login/LoginPhone",
+      headers: { Phone: payload.Phone.toString() },
+      body: null,
+    }
+  );
 
   const res = await sendRequest().post("/Login/LoginPhone", null, {
     headers: {
@@ -42,17 +54,27 @@ export const login = async (
     },
   });
   const data = await res.data;
+
+  console.log(
+    "%cResponse from /Login/LoginPhone",
+    "color: green; background: black",
+    data
+  );
   return data;
 };
 
 export const sendOTP = async (Phone: string) => {
   try {
-    console.log("Sending POST request to /Login/LoginPhone", {
-      method: "POST",
-      endpoint: "/Login/LoginPhone",
-      headers: { Phone },
-      body: null,
-    });
+    console.log(
+      "%cSending POST request to /Login/LoginPhone",
+      "color: red; background: black",
+      {
+        method: "POST",
+        endpoint: "/Login/LoginPhone",
+        headers: { Phone },
+        body: null,
+      }
+    );
 
     const res = await sendRequest().post("/Login/LoginPhone", null, {
       headers: {
@@ -60,9 +82,20 @@ export const sendOTP = async (Phone: string) => {
       },
     });
     const data = await res.data;
+
+    console.log(
+      "%cResponse from /Login/LoginPhone",
+      "color: green; background: black",
+      data
+    );
     toast.success(data?.message);
     return data;
   } catch (error: any) {
+    console.error(
+      "%cERROR in sendOTP:",
+      "color: red; background: black",
+      error
+    );
     toast.error(error?.message);
     return error;
   }
@@ -78,16 +111,20 @@ export const register = async (
       }, 10000);
     });
 
-    console.log("Sending POST request to /Login/Register", {
-      method: "POST",
-      endpoint: "/Login/Register",
-      headers: { "Content-Type": "application/json" },
-      body: {
-        phone: "0" + payload.phone,
-        name: payload.name,
-        family: payload.family,
-      },
-    });
+    console.log(
+      "%cSending POST request to /Login/Register",
+      "color: red; background: black",
+      {
+        method: "POST",
+        endpoint: "/Login/Register",
+        headers: { "Content-Type": "application/json" },
+        body: {
+          phone: "0" + payload.phone,
+          name: payload.name,
+          family: payload.family,
+        },
+      }
+    );
 
     const res = await Promise.race([
       sendRequest().post(
@@ -107,8 +144,18 @@ export const register = async (
     ]);
 
     const data = await res.data;
+    console.log(
+      "%cResponse from /Login/Register",
+      "color: green; background: black",
+      data
+    );
     return data;
   } catch (error: any) {
+    console.error(
+      "%cERROR in register:",
+      "color: red; background: black",
+      error
+    );
     toast.error(error?.message);
     return error;
   }
@@ -126,13 +173,17 @@ export const verifyOTP = async (
       }, 10000);
     });
 
-    console.log("Sending POST request to /Login/LoginPhoneAcept", {
-      method: "POST",
-      endpoint: "/Login/LoginPhoneAcept",
-      headers: { Phone: payload.Phone, Code: payload.Code },
-      body: {},
-      withCredentials: true,
-    });
+    console.log(
+      "%cSending POST request to /Login/LoginPhoneAcept",
+      "color: red; background: black",
+      {
+        method: "POST",
+        endpoint: "/Login/LoginPhoneAcept",
+        headers: { Phone: payload.Phone, Code: payload.Code },
+        body: {},
+        withCredentials: true,
+      }
+    );
 
     const res = await Promise.race([
       sendRequest().post(
@@ -150,6 +201,11 @@ export const verifyOTP = async (
     ]);
 
     const data: ApiResponseType = res.data;
+    console.log(
+      "%cResponse from /Login/LoginPhoneAcept",
+      "color: green; background: black",
+      data
+    );
 
     if (data.erroCode == 200) {
       localStorage.setItem("userData", JSON.stringify(data.data));
@@ -159,9 +215,47 @@ export const verifyOTP = async (
 
     return data;
   } catch (error: any) {
-    console.error("ERROR:", error);
+    console.error(
+      "%cERROR in verifyOTP:",
+      "color: red; background: black",
+      error
+    );
     toast.error(error?.message || "مشکلی پیش آمده است");
     throw error;
+  }
+};
+
+export const generateUniqueID = (): number => {
+  if (typeof window !== "undefined") {
+    const storedID = localStorage.getItem("userID");
+    if (storedID) {
+      return parseInt(storedID, 10);
+    }
+  }
+
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000000);
+  const newID = (timestamp * 1000000 + random) % 9007199254740991;
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem("userID", newID.toString());
+  }
+
+  console.log(
+    "%cGenerated unique ID",
+    "color: green; background: black",
+    newID
+  );
+  return newID;
+};
+
+const generateHashedID = async () => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return String(data.ip).replaceAll(".", "");
+  } catch (error) {
+    console.error("Error fetching IP address:", error);
   }
 };
 
@@ -169,48 +263,55 @@ export const getDailyData = async (): Promise<DailyDataResponseType> => {
   await createSession();
 
   try {
-    // const userIP = await fetchUserIP(); 
+    const userID = await generateHashedID();
 
-    console.log("Sending GET request to /CallOfTheDay/GetDaily", {
-      method: "GET",
-      endpoint: `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${uniqueID}`,
-      headers: {},
-      body: null,
-    });
+    console.log(
+      "%cSending GET request to /CallOfTheDay/GetDaily",
+      "color: red; background: black",
+      {
+        method: "GET",
+        endpoint: `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${userID}`,
+        headers: {},
+        body: null,
+      }
+    );
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${uniqueID}`,
+      `${process.env.NEXT_PUBLIC_USER_BASE_URL}/CallOfTheDay/GetDaily?UserID=${userID}`,
       {
         method: "GET",
       }
     );
-    
+
     const data = await res.json();
+    console.log(
+      "%cResponse from /CallOfTheDay/GetDaily",
+      "color: green; background: black",
+      data
+    );
     return data;
   } catch (error: any) {
+    console.error(
+      "%cERROR in getDailyData:",
+      "color: red; background: black",
+      error
+    );
     return error;
   }
 };
 
-// const fetchUserIP = async (): Promise<string> => {
-//   try {
-//     const res = await fetch("https://api.ipify.org?format=json");
-//     const data = await res.json();
-//     return data.ip;
-//   } catch (error) {
-//     console.error("Error fetching user IP:", error);
-//     return "unknown";
-//   }
-// };
-
 export const getMedia = async (mediaId: string) => {
-  console.log("Sending GET request to /api/v1/Media/Get", {
-    method: "GET",
-    endpoint: "/api/v1/Media/Get",
-    headers: { IDMedia: mediaId },
-    body: null,
-    apiType: "FILES",
-  });
+  console.log(
+    "%cSending GET request to /api/v1/Media/Get",
+    "color: red; background: black",
+    {
+      method: "GET",
+      endpoint: "/api/v1/Media/Get",
+      headers: { IDMedia: mediaId },
+      body: null,
+      apiType: "FILES",
+    }
+  );
 
   const res = await sendRequest("FILES").get("/api/v1/Media/Get", {
     headers: {
@@ -219,14 +320,25 @@ export const getMedia = async (mediaId: string) => {
   });
 
   const data = await res.data;
+  console.log(
+    "%cResponse from /api/v1/Media/Get",
+    "color: green; background: black",
+    data
+  );
   return data?.data as MediaType;
 };
 
 export const generateMediaSrc = (mediaId: string) => {
-  console.log("Generating media download URL", {
-    endpoint: `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`,
-    apiType: "FILES",
-  });
+  console.log(
+    "%cGenerating media download URL",
+    "color: red; background: black",
+    {
+      endpoint: `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`,
+      apiType: "FILES",
+    }
+  );
 
-  return `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`;
+  const url = `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`;
+  console.log("%cGenerated media URL", "color: green; background: black", url);
+  return url;
 };

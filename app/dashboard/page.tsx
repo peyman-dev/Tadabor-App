@@ -9,7 +9,7 @@ const DashboardPage = () => {
   return (
     <Container>
       <MediaSection />
-      <div className='md:w-1/2 space-y-[42px] w-full'>
+      <div className='md:w-1/2 space-y-[42px] w-full **:mx-auto'>
         <VerseSection />
         <Description />
       </div>

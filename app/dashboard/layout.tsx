@@ -5,7 +5,6 @@ import { getDailyData } from '../actions'
 // import { getDailyData } from '../actions'
 
 const layout = async ({ children }: { children: ReactNode }) => {
-
     //? This is the test data (Back-End had some bugs and My Request was not working)
     // const Response: HolyResponse = useTestData()
 
@@ -13,7 +12,7 @@ const layout = async ({ children }: { children: ReactNode }) => {
     // const media = await getMedia(String(foundedMediaEntry?.value))
 
     //* Fetch Daily Data from Server
-    const Response = await getDailyData()
+    const Response = await getDailyData() // ✅
 
 
     return (

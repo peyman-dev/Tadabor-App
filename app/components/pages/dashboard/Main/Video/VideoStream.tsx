@@ -21,7 +21,6 @@ const VideoStream = () => {
   const [rotation, setRotation] = useState<number>(0); 
 
 
-  console.log(media)
   
   useEffect(() => {
     const video = videoRef.current;
@@ -29,7 +28,6 @@ const VideoStream = () => {
 
     const src = generateMediaSrc(String(media?.id));
 
-    console.log(src)
     
     video.src = src;
 

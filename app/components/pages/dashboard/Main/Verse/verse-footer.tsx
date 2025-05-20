@@ -7,7 +7,7 @@ import { InformationSentence } from "@/app/core/types/types";
 import React from "react";
 
 const VerseFooter = ({ content }: { content?: any }) => {
-    const { data } = useTestData()
+    const { data } = useHolyStore()
     const informationSentences = (data?.informationSentences as InformationSentence[]) || [];
 
     const juzItem = useQuickInformation(informationSentences, "جزء");
