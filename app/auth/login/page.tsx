@@ -50,10 +50,11 @@ const LoginPage = () => {
                 if (res.erroCode == 200) {
                     toast.success(res.message)
                 } else {
-                    toast.error(res.message)
+                    toast.error("عملیات با خطا مواجه شد ")
                 }
             } catch (error) {
-                console.log(error)
+                toast.error("عملیات با خطا مواجه شد ")
+
             } finally {
                 setIsLoading(false)
             }
@@ -63,10 +64,12 @@ const LoginPage = () => {
                 const res = await sendOTP(String("0" + values.phoneNumber))
                 if (res.erroCode == 200) {
                     openUI(<OTPModal phone={String("0" + values.phoneNumber)} />)
+                } else {
+                    toast.error("عملیات با خطا مواجه شد ")
                 }
 
             } catch (error: any) {
-                toast.error(error?.message)
+                toast.error("عملیات با خطا مواجه شد ")
             } finally {
                 setIsLoading(false)
             }

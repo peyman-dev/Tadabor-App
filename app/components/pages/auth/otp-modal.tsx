@@ -1,6 +1,7 @@
 "use client";
 import { Input } from "antd";
-import React, { useState } from "react";
+import { redirect } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import PrimaryButton from "../../common/buttons/primary-button";
 import { verifyOTP } from "@/app/actions";
 import toast from "react-hot-toast";
@@ -9,13 +10,14 @@ import { ApiResponseType } from "@/app/core/types/types";
 const OTPModal = ({ phone }: { phone: string }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [OTP, setOTP] = useState<string>("");
+    const [response, setResponse] = useState<ApiResponseType>()
 
     const handleSubmit = async (otp: string) => {
         // Prevent submission if already loading or OTP is empty
         if (isLoading || !otp) return;
 
         try {
-    
+
 
             setIsLoading(true);
             await toast.promise(
@@ -26,20 +28,29 @@ const OTPModal = ({ phone }: { phone: string }) => {
                 {
                     loading: "درحال ورود, منتظر بمانید ...",
                     success: (res: ApiResponseType) => {
-                        setIsLoading(false);
+                        setResponse(res)
                         if (res.erroCode === 200) return "شما باموفقیت وارد شدید !";
                         throw new Error(res.message);
                     },
                     error: (res: ApiResponseType) => {
-                        setIsLoading(false);
                         return String(res.message || "خطایی رخ داد");
                     },
                 }
-            );
+            ).finally(() => {
+                setIsLoading(false);
+            })
         } catch (error) {
             console.error("OTP verification failed:", error);
         }
     };
+
+    useEffect(() => {
+        if (!isLoading && !!response?.erroCode) {
+            if (response.erroCode) redirect("/dashboard");
+            else return () => {}
+        }
+    }, [isLoading, response])
+
 
     return (
         <div className="my-10 w-full">
@@ -56,7 +67,6 @@ const OTPModal = ({ phone }: { phone: string }) => {
                     <Input.OTP
                         onChange={(v: string) => {
                             setOTP(v);
-                            // Only submit when OTP is complete (e.g., 4 digits)
                             if (v.length === 4) {
                                 handleSubmit(v);
                             }
@@ -68,7 +78,7 @@ const OTPModal = ({ phone }: { phone: string }) => {
                 <PrimaryButton
                     loading={isLoading}
                     onClick={() => handleSubmit(OTP)}
-                    disabled={isLoading || OTP.length !== 4} // Disable if loading or OTP incomplete
+                    disabled={isLoading || OTP.length !== 4}
                     className=""
                 >
                     ورود
