@@ -25,6 +25,7 @@ const VideoStream = () => {
 
   const media = useQuickInformation(data?.informationSentences as InformationSentence[], "Media")
 
+  console.log(media)
 
   
   useEffect(() => {
@@ -33,8 +34,6 @@ const VideoStream = () => {
 
     const src = generateMediaSrc(String(media?.value));
 
-    console.log(media)
-    
     video.src = src;
 
     const handleLoadedMetadata = () => {
@@ -65,7 +64,7 @@ const VideoStream = () => {
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', handleError);
     };
-  }, []);
+  }, [media]);
 
   useEffect(() => {
     const video = videoRef.current;
