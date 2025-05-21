@@ -6,6 +6,7 @@ import PrimaryButton from "../../common/buttons/primary-button";
 import { verifyOTP } from "@/app/actions";
 import toast from "react-hot-toast";
 import { ApiResponseType } from "@/app/core/types/types";
+import { generateCacheForUserResponse } from "@/app/core/utils";
 
 const OTPModal = ({ phone }: { phone: string }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,7 @@ const OTPModal = ({ phone }: { phone: string }) => {
                     loading: "درحال ورود, منتظر بمانید ...",
                     success: (res: ApiResponseType) => {
                         setResponse(res)
+                        generateCacheForUserResponse(res)
                         if (res.erroCode === 200) return "شما باموفقیت وارد شدید !";
                         throw new Error(res.message);
                     },

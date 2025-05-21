@@ -6,33 +6,33 @@ export type LoginPayloadType = {
 export type RegisterType = {
   phone: string;
   name: string;
-  family: string
+  family: string;
+};
+
+export type UserType = {
+  id: number;
+  idPerson: number;
+  username: string | null;
+  password: string;
+  unixTimeLastSeen: number | null;
+  status: boolean;
+  code: number;
+  actor: string | null;
 };
 
 export type ApiResponseType = {
   erroCode: number;
   systemMessage: string;
   message: string;
-  data: {
-    id: number;
-    idPerson: number;
-    username: string | null;
-    password: string;
-    unixTimeLastSeen: number | null;
-    status: boolean;
-    code: number;
-    actor: string | null;
-  };
+  data: UserType;
 };
 
 export type OTPValidationType = {
-  Phone: string,
-  Code: string
-}
+  Phone: string;
+  Code: string;
+};
 
-export type LoginMethodType = "OTP" | "PASSWORD"
-
-
+export type LoginMethodType = "OTP" | "PASSWORD";
 
 // تعریف تایپ‌های فرعی برای بخش‌های مختلف
 interface Information {
@@ -177,7 +177,6 @@ export interface MediaType {
   pathMain: string | null;
   duration: number;
 }
-
 
 export interface DailyDataResponseType {
   erroCode: number;

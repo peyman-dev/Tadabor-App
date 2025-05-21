@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { generateCacheForUserResponse } from '@/app/core/utils'
 
 interface AuthValuesType {
     phoneNumber: number | null
@@ -49,6 +50,8 @@ const LoginPage = () => {
 
                 if (res.erroCode == 200) {
                     toast.success(res.message)
+                    // Cache the user data in localStorage
+                    generateCacheForUserResponse(res)
                 } else {
                     toast.error("عملیات با خطا مواجه شد ")
                 }

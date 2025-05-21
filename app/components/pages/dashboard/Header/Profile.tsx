@@ -5,9 +5,12 @@ import ProfileIcon from '@/app/assets/svgs/ProfileIcon'
 import React, { useState } from 'react'
 import { redirect } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
+import { getCachedUser } from '@/app/core/utils'
 
 const Profile = () => {
   const [isLoading, setIsLoading] = useState(false)
+
+  const revalidatedUser = getCachedUser()
 
   const handleNavigate = () => {
     setIsLoading(true);
@@ -20,10 +23,16 @@ const Profile = () => {
         : <>
           <div className='text-center md:visible md:inline-block hidden invisible space-y-1 text-xs'>
             <p className='text-[#2B2B2B]'>
-             کاربر مهمان
+              {revalidatedUser?.username ||
+                "کاربر مهمان"
+              }
             </p>
-            {/* <p className='text-xs'>کاربر سامانه</p> */}
-            <p className='text-xs'> ورود به سامانه</p>
+            {
+              revalidatedUser?.id ?
+                <p className='text-xs'>کاربر سامانه</p>
+                :
+                <p className='text-xs'> ورود به سامانه</p>
+            }
           </div>
           <BorderedButton className='flex items-center justify-center'>
             <ProfileIcon />
