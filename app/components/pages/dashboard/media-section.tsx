@@ -8,13 +8,12 @@ import { generateMediaSrc } from '@/app/actions';
 const MediaSection = () => {
     const { data } = useHolyStore()
 
-
-
+    console.log(data?.audio)
 
     return (
         <div className='md:w-1/2'>
             <VideoStream />
-            <AudioPlayer src={generateMediaSrc(String(data?.audio.id))} />
+            <AudioPlayer src={generateMediaSrc(String(data?.audio?.idmedia))} />
         </div>
     )
 }

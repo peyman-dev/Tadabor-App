@@ -15,7 +15,7 @@ type DataItem = {
 };
 
 const useQuickInformation = (data: InformationSentence[], targetInfo: Information['value']) => {
-  return data.find((item) => item.information.value === targetInfo) || null;
+  return data?.find((item) => item.information.value === targetInfo) || null;
 };
 
 export default useQuickInformation;

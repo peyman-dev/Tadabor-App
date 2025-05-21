@@ -1,19 +1,21 @@
 'use client';
 
 import { getMedia, generateMediaSrc } from '@/app/actions';
+import useQuickInformation from '@/app/core/hooks/use-quick-information';
 import { useHolyStore } from '@/app/core/stores/holy.store';
+import { InformationSentence } from '@/app/core/types/types';
 import { PauseIcon, PlayIcon, RotateCw, Maximize } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 const VideoStream = () => {
   const {
-    media,
     isVideoPlaying,
     setIsVideoPlaying,
     isFullScreen,
     setIsFullScreen,
     setIsAudioPlaying,
     playbackRate,
+    data
   } = useHolyStore();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -21,13 +23,17 @@ const VideoStream = () => {
   const [rotation, setRotation] = useState<number>(0); 
 
 
+  const media = useQuickInformation(data?.informationSentences as InformationSentence[], "Media")
+
+
   
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const src = generateMediaSrc(String(media?.id));
+    const src = generateMediaSrc(String(media?.value));
 
+    console.log(media)
     
     video.src = src;
 
@@ -59,7 +65,7 @@ const VideoStream = () => {
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', handleError);
     };
-  }, ["1600175", setIsVideoPlaying, isVideoPlaying]);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -127,6 +133,7 @@ const VideoStream = () => {
           onClick={() => setIsVideoPlaying(!isVideoPlaying)}
           preload="metadata"
           onDoubleClick={toggleFullScreen}
+          
         />
 
         {/* دکمه چرخش */}

@@ -1,4 +1,4 @@
-import NameHolder from '@/app/components/pages/dashboard/Main/svgs/name-holder'
+import NameHolder from '@/app/assets/svgs/name-holder'
 import React from 'react'
 
 const DescriptionTitle = ({ title = "توضیحات" }) => {

@@ -8,10 +8,11 @@ import {
   OTPValidationType,
   RegisterType,
 } from "./core/types/types";
-
 import { v4 as uniqueID } from "uuid";
 
+// Function to create a session by sending a GET request to /Login/CreateSession
 export const createSession = async (): Promise<ApiResponseType> => {
+  // Log the initiation of a GET request to /Login/CreateSession with details about the request
   console.log(
     "%cSending GET request to /Login/CreateSession",
     "color: red; background: black",
@@ -26,6 +27,7 @@ export const createSession = async (): Promise<ApiResponseType> => {
   const res = await sendRequest().get("/Login/CreateSession");
   const data = await res.data;
 
+  // Log the response received from the /Login/CreateSession endpoint
   console.log(
     "%cResponse from /Login/CreateSession",
     "color: green; background: black",
@@ -34,9 +36,11 @@ export const createSession = async (): Promise<ApiResponseType> => {
   return data;
 };
 
+// Function to log in a user by sending a POST request to /Login/LoginPhone
 export const login = async (
   payload: LoginPayloadType
 ): Promise<ApiResponseType> => {
+  // Log the initiation of a POST request to /Login/LoginPhone, including the phone number in headers
   console.log(
     "%cSending POST request to /Login/LoginPhone",
     "color: red; background: black",
@@ -55,6 +59,7 @@ export const login = async (
   });
   const data = await res.data;
 
+  // Log the response received from the /Login/LoginPhone endpoint
   console.log(
     "%cResponse from /Login/LoginPhone",
     "color: green; background: black",
@@ -63,8 +68,10 @@ export const login = async (
   return data;
 };
 
+// Function to send an OTP by making a POST request to /Login/LoginPhone
 export const sendOTP = async (Phone: string) => {
   try {
+    // Log the initiation of a POST request to /Login/LoginPhone for OTP sending
     console.log(
       "%cSending POST request to /Login/LoginPhone",
       "color: red; background: black",
@@ -83,6 +90,7 @@ export const sendOTP = async (Phone: string) => {
     });
     const data = await res.data;
 
+    // Log the response received from the /Login/LoginPhone endpoint after OTP request
     console.log(
       "%cResponse from /Login/LoginPhone",
       "color: green; background: black",
@@ -91,6 +99,7 @@ export const sendOTP = async (Phone: string) => {
     toast.success(data?.message);
     return data;
   } catch (error: any) {
+    // Log any error that occurs during the OTP sending process
     console.error(
       "%cERROR in sendOTP:",
       "color: red; background: black",
@@ -101,16 +110,19 @@ export const sendOTP = async (Phone: string) => {
   }
 };
 
+// Function to register a new user by sending a POST request to /Login/Register
 export const register = async (
   payload: RegisterType
 ): Promise<ApiResponseType> => {
   try {
+    // Create a promise to handle request timeout after 10 seconds
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => {
         reject(new Error("درخواست بیش از 10 ثانیه طول کشید"));
       }, 10000);
     });
 
+    // Log the initiation of a POST request to /Login/Register with user details
     console.log(
       "%cSending POST request to /Login/Register",
       "color: red; background: black",
@@ -144,6 +156,7 @@ export const register = async (
     ]);
 
     const data = await res.data;
+    // Log the response received from the /Login/Register endpoint
     console.log(
       "%cResponse from /Login/Register",
       "color: green; background: black",
@@ -151,6 +164,7 @@ export const register = async (
     );
     return data;
   } catch (error: any) {
+    // Log any error that occurs during the registration process
     console.error(
       "%cERROR in register:",
       "color: red; background: black",
@@ -161,18 +175,21 @@ export const register = async (
   }
 };
 
+// Function to verify OTP by sending a POST request to /Login/LoginPhoneAcept
 export const verifyOTP = async (
   payload: OTPValidationType
 ): Promise<ApiResponseType> => {
   try {
     await createSession();
 
+    // Create a promise to handle request timeout after 10 seconds
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => {
         reject(new Error("درخواست بیش از 10 ثانیه طول کشید"));
       }, 10000);
     });
 
+    // Log the initiation of a POST request to /Login/LoginPhoneAcept with phone and OTP code
     console.log(
       "%cSending POST request to /Login/LoginPhoneAcept",
       "color: red; background: black",
@@ -201,6 +218,7 @@ export const verifyOTP = async (
     ]);
 
     const data: ApiResponseType = res.data;
+    // Log the response received from the /Login/LoginPhoneAcept endpoint
     console.log(
       "%cResponse from /Login/LoginPhoneAcept",
       "color: green; background: black",
@@ -215,6 +233,7 @@ export const verifyOTP = async (
 
     return data;
   } catch (error: any) {
+    // Log any error that occurs during OTP verification
     console.error(
       "%cERROR in verifyOTP:",
       "color: red; background: black",
@@ -225,6 +244,7 @@ export const verifyOTP = async (
   }
 };
 
+// Function to generate a unique user ID based on timestamp and random number
 export const generateUniqueID = (): number => {
   if (typeof window !== "undefined") {
     const storedID = localStorage.getItem("userID");
@@ -241,6 +261,7 @@ export const generateUniqueID = (): number => {
     localStorage.setItem("userID", newID.toString());
   }
 
+  // Log the newly generated unique ID
   console.log(
     "%cGenerated unique ID",
     "color: green; background: black",
@@ -249,22 +270,26 @@ export const generateUniqueID = (): number => {
   return newID;
 };
 
+// Function to generate a hashed ID based on the user's IP address
 const generateHashedID = async () => {
   try {
     const response = await fetch("https://api.ipify.org?format=json");
     const data = await response.json();
     return String(data.ip).replaceAll(".", "");
   } catch (error) {
+    // Log any error that occurs while fetching the IP address
     console.error("Error fetching IP address:", error);
   }
 };
 
+// Function to fetch daily data by sending a GET request to /CallOfTheDay/GetDaily
 export const getDailyData = async (): Promise<DailyDataResponseType> => {
   await createSession();
 
   try {
     const userID = await generateHashedID();
 
+    // Log the initiation of a GET request to /CallOfTheDay/GetDaily with user ID
     console.log(
       "%cSending GET request to /CallOfTheDay/GetDaily",
       "color: red; background: black",
@@ -284,6 +309,7 @@ export const getDailyData = async (): Promise<DailyDataResponseType> => {
     );
 
     const data = await res.json();
+    // Log the response received from the /CallOfTheDay/GetDaily endpoint
     console.log(
       "%cResponse from /CallOfTheDay/GetDaily",
       "color: green; background: black",
@@ -291,6 +317,7 @@ export const getDailyData = async (): Promise<DailyDataResponseType> => {
     );
     return data;
   } catch (error: any) {
+    // Log any error that occurs during the fetching of daily data
     console.error(
       "%cERROR in getDailyData:",
       "color: red; background: black",
@@ -300,7 +327,9 @@ export const getDailyData = async (): Promise<DailyDataResponseType> => {
   }
 };
 
+// Function to fetch media data by sending a GET request to /api/v1/Media/Get
 export const getMedia = async (mediaId: string) => {
+  // Log the initiation of a GET request to /api/v1/Media/Get with media ID
   console.log(
     "%cSending GET request to /api/v1/Media/Get",
     "color: red; background: black",
@@ -320,6 +349,7 @@ export const getMedia = async (mediaId: string) => {
   });
 
   const data = await res.data;
+  // Log the response received from the /api/v1/Media/Get endpoint
   console.log(
     "%cResponse from /api/v1/Media/Get",
     "color: green; background: black",
@@ -329,16 +359,6 @@ export const getMedia = async (mediaId: string) => {
 };
 
 export const generateMediaSrc = (mediaId: string) => {
-  console.log(
-    "%cGenerating media download URL",
-    "color: red; background: black",
-    {
-      endpoint: `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`,
-      apiType: "FILES",
-    }
-  );
-
-  const url = `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?${mediaId}`;
-  console.log("%cGenerated media URL", "color: green; background: black", url);
+  const url = `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?IDMedia=${mediaId}`;
   return url;
 };

@@ -1,7 +1,7 @@
 "use client"
 
 import BorderedButton from '@/app/components/common/buttons/bordered-button'
-import ProfileIcon from '@/app/components/pages/dashboard/Main/svgs/ProfileIcon'
+import ProfileIcon from '@/app/assets/svgs/ProfileIcon'
 import React, { useState } from 'react'
 import { redirect } from 'next/navigation'
 import { Loader2 } from 'lucide-react'

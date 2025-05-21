@@ -1,5 +1,5 @@
 "use client";
-import FooterHolder from "@/app/components/pages/dashboard/Main/svgs/footer-holder";
+import FooterHolder from "@/app/assets/svgs/footer-holder";
 import useQuickInformation from "@/app/core/hooks/use-quick-information";
 import useTestData from "@/app/core/hooks/useTestData";
 import { useHolyStore } from "@/app/core/stores/holy.store";
