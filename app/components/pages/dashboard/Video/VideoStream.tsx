@@ -20,21 +20,25 @@ const VideoStream = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rotation, setRotation] = useState<number>(0); 
+  const [rotation, setRotation] = useState<number>(0);
 
 
   const media = useQuickInformation(data?.informationSentences as InformationSentence[], "Media")
 
-  console.log(media)
+  const fetchUrl = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const src = await generateMediaSrc(String(media?.value));
+    video.src = src;
+  }
+  // const src =
 
-  
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const src = generateMediaSrc(String(media?.value));
-
-    video.src = src;
+    fetchUrl()
 
     const handleLoadedMetadata = () => {
       setError(null);
@@ -102,7 +106,7 @@ const VideoStream = () => {
   };
 
   const handleRotate = () => {
-    setRotation((prev) => (prev + 90) % 360); 
+    setRotation((prev) => (prev + 90) % 360);
   };
 
   return (
@@ -132,7 +136,7 @@ const VideoStream = () => {
           onClick={() => setIsVideoPlaying(!isVideoPlaying)}
           preload="metadata"
           onDoubleClick={toggleFullScreen}
-          
+
         />
 
         {/* دکمه چرخش */}

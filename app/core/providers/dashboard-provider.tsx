@@ -8,22 +8,18 @@ const DashboardProvider = ({ children, response, media }: { children: ReactNode,
     //* Primary Store 
     const store = useHolyStore()
 
-    console.log(response)
 
     useEffect(() => {
         // if (!!media.id) store.setMedia(media);
         // if (response.data) store.setData(response.data);
 
         const parsedData = ParseThis(response.data?.body)
-        if (response?.erroCode == 200) store.setData(parsedData?.data
-        );
+        if (response?.erroCode == 200) store.setData(parsedData?.data);
 
     }, [response, media])
 
 
-    return (
-        <>{children}</>
-    )
+    return children
 }
 
 export default DashboardProvider

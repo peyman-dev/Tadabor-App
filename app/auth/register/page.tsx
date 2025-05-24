@@ -42,8 +42,8 @@ const RegisterPage = () => {
         openUI(<OTPModal phone={values.phone} />)
       }
 
-    } catch (error) {
-
+    } catch (error: any) {
+      toast.error(error.message)
     } finally {
       setIsLoading(false)
     }

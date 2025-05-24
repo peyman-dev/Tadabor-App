@@ -14,7 +14,6 @@ const OTPModal = ({ phone }: { phone: string }) => {
     const [response, setResponse] = useState<ApiResponseType>()
 
     const handleSubmit = async (otp: string) => {
-        // Prevent submission if already loading or OTP is empty
         if (isLoading || !otp) return;
 
         try {

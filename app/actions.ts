@@ -328,7 +328,15 @@ export const getMedia = async (mediaId: string) => {
   return data?.data as MediaType;
 };
 
-export const generateMediaSrc = (mediaId: string) => {
-  const url = `${process.env.NEXT_PUBLIC_FILES_BASE_URL}/api/File/DownloadFile?IDMedia=${mediaId}`;
-  return url;
+export const generateMediaSrc = async (mediaId: string) => {
+  if (typeof mediaId !== "undefined") {
+    const res = await sendRequest("FILES").get(
+      `/api/File/DownloadFile?IDMedia=${mediaId}`
+    );
+    const data = await res.data;
+    return data;
+  } else
+    return {
+      erroCode: 400,
+    };
 };

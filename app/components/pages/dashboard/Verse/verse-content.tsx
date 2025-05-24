@@ -1,6 +1,5 @@
 'use client'
 
-import useTestData from '@/app/core/hooks/useTestData'
 import { useHolyStore } from '@/app/core/stores/holy.store'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'

@@ -6,7 +6,7 @@ import { HolyDataType } from '@/app/core/types/types'
 
 const Description = () => {
   const { data } = useHolyStore()
-  const dataDesc = data?.informationSentences[3].value
+  const dataDesc = data?.informationSentences[3]?.value
 
 
 
